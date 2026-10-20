@@ -1,2 +1,2 @@
 # BoO-26
-Battle of Olympus Reimagination
+Spiritual Successor to Battle for Olympus
