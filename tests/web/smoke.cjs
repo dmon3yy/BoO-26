@@ -48,11 +48,9 @@ function serve() {
   page.on("console", (m) => { logs.push(`${m.type()}: ${m.text()}`); if (m.type() === "error") errors.push(m.text()); });
   page.on("pageerror", (e) => errors.push(String(e)));
   await page.goto(url, { waitUntil: "load" });
-  // The isolation service worker reloads the page once on first visit.
-  await page.waitForTimeout(4000);
-  if (!(await page.evaluate(() => self.crossOriginIsolated))) {
-    await page.reload({ waitUntil: "load" });
-  }
+  // The isolation service worker reloads the page on first visit; the page
+  // must get there on its own (no manual reload), as it does for players.
+  await page.waitForTimeout(15000);
   await page.waitForSelector("canvas", { timeout: 60000 });
   await page.mouse.click(480, 270);          // user gesture: unlock audio
   await page.waitForTimeout(12000);
@@ -82,5 +80,7 @@ function serve() {
   await browser.close();
   server.close();
   const fatal = errors.filter((e) => !/favicon|GPU stall|WebGL|swiftshader|Service worker already exists/i.test(e));
-  process.exit(result.canvas && result.status === "none" && fatal.length === 0 ? 0 : 1);
+  // The threaded build must end up isolated on its own, not on the lite fallback.
+  const isolatedOk = path.basename(root) === "lite" || result.crossOriginIsolated === true;
+  process.exit(result.canvas && result.status === "none" && isolatedOk && fatal.length === 0 ? 0 : 1);
 })().catch((e) => { console.error(e); process.exit(1); });

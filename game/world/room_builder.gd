@@ -311,7 +311,7 @@ static func _spawn_prop(room: Room, spec: Dictionary, foot: Vector2, entity_id: 
 		var at: Vector2 = anchor + Vector2(l["offset"][0], l["offset"][1])
 		room.add_child(FxNodes.light(at, l))
 		var c: Array = l.get("color", [1, 1, 1])
-		room.add_child(FxNodes.halo(at, Color(c[0], c[1], c[2], 0.7), 28.0 * float(l.get("scale", 1.0))))
+		room.add_child(FxNodes.halo(at, Color(c[0], c[1], c[2], 0.7), float(l.get("halo", 28.0 * float(l.get("scale", 1.0))))))
 	if spec.get("solid", false):
 		var body := StaticBody2D.new()
 		var shape := CollisionShape2D.new()
