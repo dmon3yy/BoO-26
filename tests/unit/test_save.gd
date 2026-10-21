@@ -67,13 +67,20 @@ func test_word_detects_a_typo() -> void:
 	assert_ne(Save.read_word(broken), OK)
 
 
-func test_olives_drop_and_recover() -> void:
+func test_death_drops_half_the_olives_and_they_can_be_recovered() -> void:
 	GameState.olives = 30
 	GameState.drop_olives_on_death("arcadia_01", Vector2(100, 200))
-	assert_eq(GameState.olives, 0)
-	assert_eq(GameState.dropped_olives["amount"], 30)
-	assert_eq(GameState.recover_dropped_olives(), 30)
+	assert_eq(GameState.olives, 15)
+	assert_eq(GameState.dropped_olives["amount"], 15)
+	assert_eq(GameState.recover_dropped_olives(), 15)
 	assert_eq(GameState.olives, 30)
+
+
+func test_odd_olive_counts_drop_the_larger_half() -> void:
+	GameState.olives = 7
+	GameState.drop_olives_on_death("arcadia_01", Vector2.ZERO)
+	assert_eq(GameState.dropped_olives["amount"], 4)
+	assert_eq(GameState.olives, 3)
 
 
 func test_dying_again_loses_the_first_pile() -> void:
@@ -81,5 +88,5 @@ func test_dying_again_loses_the_first_pile() -> void:
 	GameState.drop_olives_on_death("arcadia_01", Vector2(100, 200))
 	GameState.olives = 4
 	GameState.drop_olives_on_death("arcadia_02", Vector2(10, 20))
-	assert_eq(GameState.dropped_olives["amount"], 4)
+	assert_eq(GameState.dropped_olives["amount"], 2)
 	assert_eq(GameState.dropped_olives["room"], "arcadia_02")

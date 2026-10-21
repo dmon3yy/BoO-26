@@ -26,6 +26,7 @@ const KEYS := {
 	&"lyre": [KEY_SHIFT, KEY_I],
 	&"item": [KEY_Q],
 	&"pause": [KEY_ESCAPE, KEY_ENTER],
+	&"map": [KEY_TAB, KEY_M],
 	&"debug_next_room": [KEY_F2],
 	&"debug_beat_lab": [KEY_F3],
 	&"debug_dialogue": [KEY_F4],
@@ -44,6 +45,7 @@ const PAD_BUTTONS := {
 	&"lyre": [JOY_BUTTON_LEFT_SHOULDER],
 	&"item": [JOY_BUTTON_Y],
 	&"pause": [JOY_BUTTON_START],
+	&"map": [JOY_BUTTON_BACK],
 }
 
 const PAD_AXES := {

@@ -5,10 +5,19 @@ extends Node2D
 ## Rooms are placed on the global grid from content/world.json. Crossing a
 ## room's edge freezes Orpheus for a moment while the camera glides into the
 ## next room; the room he left stays built so turning back is instant.
+##
+## It also owns what happens *in* the world rather than to Orpheus himself:
+## resting at Hearths, dying on hazards and respawning, and the auto-map.
 
 const VIEW := Vector2(480, 270)
 const SCROLL_TIME := 0.38
 const LOOK_AHEAD := 28.0
+## The camera holds its height while Orpheus jumps, and only follows when he
+## lands, climbs above this band, or falls below it.
+const BAND_UP := 56.0
+const BAND_DOWN := 20.0
+const HEARTH_REACH := 20.0
+const FADE_TIME := 0.3
 
 var cell_px: Vector2
 var room_cells: Dictionary = {}      # Vector2i grid cell -> room id
@@ -27,6 +36,12 @@ var _weather: CPUParticles2D
 var _theme_id := ""
 var _cam_pos := Vector2.ZERO
 var _transitioning := false
+var _anchor_y := 0.0
+var _busy := false              # dying, respawning or resting
+var _fade: ColorRect
+var _prompt: Label
+var _toast: Control
+var _map: MapScreen
 
 
 func _ready() -> void:
@@ -58,6 +73,21 @@ func _ready() -> void:
 	camera.process_callback = Camera2D.CAMERA2D_PROCESS_PHYSICS
 	add_child(camera)
 
+	var ui := CanvasLayer.new()
+	ui.layer = 15
+	add_child(ui)
+	_prompt = UiKit.label("", Vector2.ZERO, UiKit.GOLD)
+	_prompt.visible = false
+	ui.add_child(_prompt)
+	_fade = ColorRect.new()
+	_fade.color = Color(0, 0, 0, 0)
+	_fade.size = VIEW
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(_fade)
+	_map = MapScreen.new()
+	_map.world = self
+	add_child(_map)
+
 
 func start(room_id: String) -> void:
 	if not room_origin.has(room_id):
@@ -69,9 +99,22 @@ func start(room_id: String) -> void:
 	player.position = current.player_start if current.player_start != Vector2.ZERO \
 		else current.rect.get_center()
 	add_child(player)
+	_snap_camera()
+	camera.make_current()
+
+
+## Put Orpheus at a world position (in the right room) with the camera on him.
+func place_player(room_id: String, pos: Vector2) -> void:
+	_enter(room_id)
+	player.global_position = pos
+	player.velocity = Vector2.ZERO
+	_snap_camera()
+
+
+func _snap_camera() -> void:
+	_anchor_y = player.global_position.y
 	_cam_pos = _camera_target()
 	camera.position = _cam_pos.round()
-	camera.make_current()
 
 
 func room_at(world_pos: Vector2) -> String:
@@ -185,7 +228,12 @@ func _set_weather(kind: String) -> void:
 
 
 func _camera_target() -> Vector2:
-	var focus := player.global_position + Vector2(player.facing * LOOK_AHEAD, -24)
+	var p := player.global_position
+	if player.is_on_floor():
+		_anchor_y = p.y
+	else:
+		_anchor_y = clampf(_anchor_y, p.y - BAND_DOWN, p.y + BAND_UP)
+	var focus := Vector2(p.x + player.facing * LOOK_AHEAD, _anchor_y - 24)
 	return _clamp_to(current.rect, focus)
 
 
@@ -200,12 +248,147 @@ func _clamp_to(r: Rect2, p: Vector2) -> Vector2:
 
 func _physics_process(delta: float) -> void:
 	_update_camera(delta)
-	if player == null or _transitioning:
+	if player == null or _transitioning or _busy:
 		return
+	if _touching_hazard() or _fell_out_of_world():
+		die()
+		return
+	_update_hearth_prompt()
 	if not current.rect.has_point(player.global_position + Vector2(0, -8)):
 		var next := room_at(player.global_position + Vector2(0, -8))
 		if next != "" and next != current.data.id:
 			_transition(next)
+
+
+# --- Hazards, death and respawn ---------------------------------------------
+
+## The map character under a world position ("" outside every room).
+func char_at(world_pos: Vector2) -> String:
+	var id := room_at(world_pos)
+	if id == "":
+		return ""
+	var local: Vector2 = (world_pos - room_origin[id]) / RoomData.TILE
+	return ContentDB.room(id).char_at(floori(local.x), floori(local.y))
+
+
+func _touching_hazard() -> bool:
+	var p := player.global_position
+	for probe in [p + Vector2(-4, -2), p + Vector2(4, -2), p + Vector2(0, -16)]:
+		if char_at(probe) in ["^", "~"]:
+			return true
+	return false
+
+
+func _fell_out_of_world() -> bool:
+	var p := player.global_position
+	return p.y > current.rect.end.y + 8 and room_at(p) == ""
+
+
+## Souls-lite death: half the olives stay here, Orpheus wakes at his Hearth.
+func die() -> void:
+	if _busy:
+		return
+	_busy = true
+	player.frozen = true
+	var at := player.global_position
+	GameState.drop_olives_on_death(current.data.id, at)
+	Events.player_died.emit(at, current.data.id)
+	# A beat of stillness so the hit registers before the screen goes dark.
+	Hitstop.freeze(get_tree(), 0.12)
+	while Hitstop.active():
+		await get_tree().process_frame
+	await _fade_to(1.0)
+	var spawn := respawn_point()
+	place_player(spawn[0], spawn[1])
+	await get_tree().create_timer(0.25).timeout
+	await _fade_to(0.0)
+	player.frozen = false
+	_busy = false
+
+
+## [room_id, world position] of the last Hearth rested at, or the start.
+func respawn_point() -> Array:
+	var hid := GameState.hearth_id
+	if hid != "" and hid.contains(":hearth_"):
+		var room_id := hid.get_slice(":", 0)
+		var xy := hid.get_slice(":hearth_", 1).split("_")
+		if room_origin.has(room_id) and xy.size() == 2:
+			return [room_id, room_origin[room_id] + _foot(int(xy[0]), int(xy[1]))]
+	var start := "arcadia_01"
+	var data := ContentDB.room(start)
+	for y in data.height:
+		var x := data.map_rows[y].find("P")
+		if x >= 0:
+			return [start, room_origin[start] + _foot(x, y)]
+	return [start, room_origin[start] + data.size_px() * 0.5]
+
+
+func _foot(x: int, y: int) -> Vector2:
+	return Vector2((x + 0.5) * RoomData.TILE, (y + 1) * RoomData.TILE)
+
+
+func _fade_to(alpha: float) -> void:
+	var tw := create_tween()
+	tw.tween_property(_fade, "color:a", alpha, FADE_TIME)
+	await tw.finished
+
+
+# --- Hearths -----------------------------------------------------------------
+
+func _nearest_hearth() -> Vector2:
+	for h in current.hearths:
+		if player.global_position.distance_to(h) <= HEARTH_REACH and player.is_on_floor():
+			return h
+	return Vector2.INF
+
+
+func _update_hearth_prompt() -> void:
+	var h := _nearest_hearth()
+	_prompt.visible = h != Vector2.INF and not is_instance_valid(_toast)
+	if not _prompt.visible:
+		return
+	_prompt.text = "UP: rest"
+	_prompt.position = (h - camera.position + VIEW * 0.5 + Vector2(-14, -44)).round()
+	if player.just_pressed(&"up"):
+		rest_at(h)
+
+
+## Kneel at a Hearth of Hestia: this becomes the respawn point, the game is
+## saved, and Hestia speaks your Word (the save as a code you can copy).
+func rest_at(h: Vector2) -> void:
+	_busy = true
+	_prompt.visible = false
+	player.frozen = true
+	player.velocity = Vector2.ZERO
+	var local: Vector2 = (h - room_origin[current.data.id]) / RoomData.TILE
+	GameState.hearth_id = "%s:hearth_%d_%d" % [current.data.id, floori(local.x), floori(local.y) - 1]
+	GameState.room_id = current.data.id
+	Save.save_game(0)
+	Events.hearth_rested.emit(GameState.hearth_id)
+	_show_word(Save.make_word())
+	await get_tree().create_timer(0.6).timeout
+	player.frozen = false
+	_busy = false
+
+
+func _show_word(word: String) -> void:
+	if is_instance_valid(_toast):
+		_toast.queue_free()
+	var box := Rect2(40, 20, 400, 0)
+	# Spaces between the groups let the Word wrap; reading a Word ignores them.
+	var shown := word.replace("-", " ")
+	var text := UiKit.label(shown, Vector2.ZERO, UiKit.INK, box.size.x - 16)
+	var per_line := floori((box.size.x - 16) / 36.0) * 6      # whole 6-character groups
+	box.size.y = 28 + ceili(shown.length() / float(per_line)) * 10
+	_toast = UiKit.panel(box)
+	_toast.add_child(UiKit.label("Hestia's Hearth. Rested and saved. Your Word:", Vector2(8, 5), UiKit.GOLD))
+	text.position = Vector2(8, 18)
+	_toast.add_child(text)
+	_prompt.get_parent().add_child(_toast)
+	var toast := _toast
+	await get_tree().create_timer(6.0).timeout
+	if is_instance_valid(toast):
+		toast.queue_free()
 
 
 func _transition(next: String) -> void:

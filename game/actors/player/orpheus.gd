@@ -8,6 +8,9 @@ extends CharacterBody2D
 
 const SHEET := "res://game/art/characters/orpheus"
 
+## Emitted on the tick he touches down, with the speed he was falling at.
+signal landed(fall_speed: float)
+
 var move: Dictionary
 var sprite: Sprite2D
 var anims: Dictionary
@@ -68,11 +71,19 @@ static func step_motion(v: Vector2, input_x: float, on_floor: bool, jump_held: b
 	var target := input_x * float(m["run_speed"])
 	var accel: float
 	if on_floor:
-		accel = float(m["ground_accel"]) if absf(input_x) > 0.01 else float(m["ground_decel"])
+		if absf(input_x) <= 0.01:
+			accel = float(m["ground_decel"])
+		elif signf(input_x) != signf(v.x) and absf(v.x) > 1.0:
+			accel = float(m["turn_accel"])     # reversing: plant the feet
+		else:
+			accel = float(m["ground_accel"])
 	else:
 		accel = float(m["air_accel"])
 	v.x = move_toward(v.x, target, accel * dt)
 	var g := float(m["gravity"]) if (v.y < 0.0 and jump_held) else float(m["fall_gravity"])
+	# Hang time: holding jump softens gravity around the top of the arc.
+	if not on_floor and jump_held and absf(v.y) < float(m["apex_window"]):
+		g *= float(m["apex_gravity_scale"])
 	v.y = minf(v.y + g * dt, float(m["max_fall"]))
 	return v
 
@@ -101,7 +112,14 @@ func _physics_process(delta: float) -> void:
 	velocity = step_motion(velocity, x, on_floor, _held(&"jump"), move, delta, released)
 	# Dropping through a ledge: hold down and jump.
 	set_collision_mask_value(2, not (_held(&"down") and _pressed(&"jump")))
+	if velocity.y < 0.0:
+		_nudge_around_ceiling_corner(delta)
+	var fall_speed := velocity.y
 	move_and_slide()
+	if is_on_floor() and not _was_on_floor:
+		landed.emit(fall_speed)
+		if fall_speed > float(move["hard_landing_speed"]):
+			_dust()
 	_was_jump_held = _held(&"jump")
 	if absf(x) > 0.01:
 		facing = 1 if x > 0 else -1
@@ -110,6 +128,41 @@ func _physics_process(delta: float) -> void:
 
 
 var _was_jump_held := false
+
+
+## Clipping a ceiling corner by a few pixels shouldn't kill a jump: slide
+## sideways (up to `corner_nudge` px) to the side that's free and keep rising.
+func _nudge_around_ceiling_corner(delta: float) -> void:
+	var up := Vector2(0, velocity.y * delta)
+	if not test_move(global_transform, up):
+		return
+	for d in range(1, int(move["corner_nudge"]) + 1):
+		for s in [1, -1]:
+			var side := Vector2(d * s, 0)
+			if not test_move(global_transform, side) and \
+					not test_move(global_transform.translated(side), up):
+				position.x += d * s
+				return
+
+
+func _dust() -> void:
+	var p := CPUParticles2D.new()
+	p.one_shot = true
+	p.emitting = true
+	p.amount = 10
+	p.lifetime = 0.35
+	p.explosiveness = 1.0
+	p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p.emission_rect_extents = Vector2(5, 1)
+	p.direction = Vector2(0, -1)
+	p.spread = 80.0
+	p.initial_velocity_min = 18.0
+	p.initial_velocity_max = 40.0
+	p.gravity = Vector2(0, 90)
+	p.color = Color(0.85, 0.88, 0.95, 0.8)
+	p.global_position = global_position
+	get_parent().add_child(p)
+	p.finished.connect(p.queue_free)
 
 
 func _animate(delta: float, x: float) -> void:
@@ -128,6 +181,12 @@ func _animate(delta: float, x: float) -> void:
 	sprite.frame = int(a["start"]) + idx
 	sprite.flip_h = facing < 0
 	sprite.offset.x = -float(32 - 15 - 1) if facing < 0 else -15.0
+
+
+## Public input queries, so the world (Hearths, menus) reads the same
+## keyboard, gamepad or scripted controls as Orpheus does.
+func just_pressed(action: StringName) -> bool:
+	return _pressed(action)
 
 
 func _axis() -> float:

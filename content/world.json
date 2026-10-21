@@ -4,6 +4,12 @@
   "rooms": {
     "arcadia_01": [0, 0],
     "arcadia_02": [2, 0],
-    "erebos_01": [0, 8]
+    "erebos_01": [0, 8],
+    "arcadia_03": [3, 0],
+    "arcadia_04": [4, 1],
+    "arcadia_05": [6, 0],
+    "arcadia_06": [7, 0],
+    "arcadia_07": [4, 2],
+    "arcadia_08": [6, 2]
   }
 }

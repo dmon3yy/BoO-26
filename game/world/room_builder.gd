@@ -47,8 +47,25 @@ static func build(data: RoomData, world_origin: Vector2) -> Room:
 	_build_collision_and_shadows(room, data)
 	_build_ledges(room, data)
 	_build_fluids(room, data)
+	_build_spikes(room, data)
 	_build_entities(room, data)
 	return room
+
+
+## '^' cells: a row of shards from the theme ("spikes" in themes.json). They
+## have no collision; the WorldManager kills Orpheus when he touches one.
+static func _build_spikes(room: Room, data: RoomData) -> void:
+	var tex := ContentDB.lit_texture(PROPS + str(room.theme.get("spikes", "spikes_ice")))
+	if tex == null:
+		return
+	for y in data.height:
+		for x in data.width:
+			if data.char_at(x, y) == "^":
+				var s := Sprite2D.new()
+				s.texture = tex
+				s.centered = false
+				s.position = Vector2(x, y) * T
+				room.add_child(s)
 
 
 # --- layers ------------------------------------------------------------------
