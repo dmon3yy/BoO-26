@@ -89,7 +89,7 @@ The world is one grid of rooms (`content/world.json`). The intended route echoes
 | Combat | Club → Staff of Fennel → Sword → Divine Sword; dodge; shield parry; **crouch strike**; combat songs. **On the beat:** ×1.5 damage, perfect parry (stagger), Muse gain. Never required. |
 | Songs | Hold Lyre, play 3–5 notes on the d-pad. Traversal songs are free; combat songs cost Muse. |
 | Seasons | Global world state. Winter: ice walkable, snow blocks. Spring: rivers flow (need the dolphin), vines climbable. |
-| Death (Souls-lite) | Respawn at the last **Hearth of Hestia**; your olives stay where you fell, guarded by your echo; die again first and they're gone. (The original's *Continue* halved olives; *Retry* returned you to the last Word.) |
+| Death (Souls-lite) | Respawn at the last **Hearth of Hestia**; ½ your current olives (not all) stay where you fell, guarded by your echo; die again first and they're gone. (The original's *Continue* halved olives; *Retry* returned you to the last Word.) |
 | Saving | Kneel at a Hearth: autosave, and the god there grants a **Word** — a copyable code that *is* your save (the original's passwords, doing a real job for browser saves). |
 | Conveniences | Auto-map (the Eye reveals secrets on it); journal of every hint, verse, name and god; completion checklist; optional markers. |
 | Accessibility | Visual beat pulse; audio / visual / input calibration (Beat Lab); rhythm assist (wider windows); remapping; colour-blind-safe telegraphs; shake and flash toggles. |
@@ -111,7 +111,7 @@ Mechanics we carry over from the original, in our own form — see [reference/or
 | Olives as currency | Same |
 | Three Fragments of Love from nymphs | Three of the nine verses, same grottos and dependency chain |
 | Words of the Gods (passwords) | Save codes granted at Hearths |
-| Continue (½ olives) / Retry (last Word) | Souls-lite olive drop + Hearth respawn |
+| Continue (½ olives) / Retry (last Word) | Souls-lite olive drop (½ current olives, not all) + Hearth respawn |
 | Sandals: Hermes → Zeus relay | Same relay, across the seamless world |
 | Ares takes the Sandals if you short-pay | Same, foreshadowed and softlock-proof |
 | Harp counters the Siren; summons Pegasus at sun monuments | Sing-off boss; Sun Monument fast travel |
