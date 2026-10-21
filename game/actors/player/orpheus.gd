@@ -26,6 +26,10 @@ var _coyote := 0.0
 var _buffer := 0.0
 var _anim_time := 0.0
 var _was_on_floor := false
+var _drop_time := 0.0
+
+## How long ledges stay see-through after Down + Jump, so he falls clear of them.
+const DROP_TIME := 0.25
 
 
 func _ready() -> void:
@@ -102,6 +106,15 @@ func _physics_process(delta: float) -> void:
 	else:
 		_buffer -= delta
 
+	# Down + Jump on a ledge drops through it instead of jumping.
+	_drop_time -= delta
+	if on_floor and _held(&"down") and _pressed(&"jump") and on_ledge():
+		_drop_time = DROP_TIME
+		_buffer = 0.0
+		_coyote = 0.0
+		on_floor = false
+	set_collision_mask_value(2, _drop_time <= 0.0)
+
 	if _buffer > 0.0 and _coyote > 0.0:
 		velocity.y = float(move["jump_velocity"])
 		_buffer = 0.0
@@ -110,8 +123,6 @@ func _physics_process(delta: float) -> void:
 
 	var released := _was_jump_held and not _held(&"jump")
 	velocity = step_motion(velocity, x, on_floor, _held(&"jump"), move, delta, released)
-	# Dropping through a ledge: hold down and jump.
-	set_collision_mask_value(2, not (_held(&"down") and _pressed(&"jump")))
 	if velocity.y < 0.0:
 		_nudge_around_ceiling_corner(delta)
 	var fall_speed := velocity.y
@@ -128,6 +139,18 @@ func _physics_process(delta: float) -> void:
 
 
 var _was_jump_held := false
+
+
+## True when he's standing on a one-way ledge (layer 2) rather than solid ground.
+func on_ledge() -> bool:
+	var down := Vector2(0, 2)
+	if not test_move(global_transform, down):
+		return false
+	var mask := collision_mask
+	collision_mask = 1
+	var solid := test_move(global_transform, down)
+	collision_mask = mask
+	return not solid
 
 
 ## Clipping a ceiling corner by a few pixels shouldn't kill a jump: slide
