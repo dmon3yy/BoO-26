@@ -1,0 +1,53 @@
+{
+  "id": "sample",
+  "width": 30,
+  "height": 17,
+  "header": {
+    "id": "sample",
+    "theme": "arcadia_winter",
+    "name": "Sample Room   ; trailing text stays part of the value"
+  },
+  "legend": {
+    "Z": {
+      "kind": "npc",
+      "params": {
+        "who": "zeus",
+        "dialogue": "zeus_intro"
+      }
+    },
+    "S": {
+      "kind": "song_seal",
+      "params": {
+        "song": "zeus"
+      }
+    }
+  },
+  "entities": [
+    [
+      "npc",
+      12,
+      10
+    ],
+    [
+      "player_start",
+      2,
+      13
+    ],
+    [
+      "hearth",
+      6,
+      13
+    ],
+    [
+      "olive",
+      20,
+      13
+    ],
+    [
+      "song_seal",
+      25,
+      13
+    ]
+  ],
+  "errors": []
+}

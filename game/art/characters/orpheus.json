@@ -1,0 +1,37 @@
+{
+  "frame_size": [
+    32,
+    48
+  ],
+  "origin": [
+    15,
+    45
+  ],
+  "anims": {
+    "idle": {
+      "start": 0,
+      "count": 8,
+      "fps": 6,
+      "loop": true
+    },
+    "run": {
+      "start": 8,
+      "count": 8,
+      "fps": 13,
+      "loop": true
+    },
+    "jump": {
+      "start": 16,
+      "count": 2,
+      "fps": 8,
+      "loop": false
+    },
+    "fall": {
+      "start": 18,
+      "count": 2,
+      "fps": 8,
+      "loop": false
+    }
+  },
+  "frames": 20
+}

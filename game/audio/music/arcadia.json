@@ -1,0 +1,15 @@
+{
+  "song": "arcadia",
+  "bpm": 84.0,
+  "beats_per_bar": 4,
+  "offset": 0.0,
+  "bars": 8,
+  "loop_seconds": 22.857142857142858,
+  "loop_samples": 1008000,
+  "swing": 0.0,
+  "stems": [
+    "res://game/audio/music/arcadia_melody.ogg",
+    "res://game/audio/music/arcadia_harmony.ogg",
+    "res://game/audio/music/arcadia_percussion.ogg"
+  ]
+}

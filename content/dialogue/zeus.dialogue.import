@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://8kk7lied32je"
+path="res://.godot/imported/zeus.dialogue-f9e24c43cbcd5fec4ac3635ca1034af5.tres"
+
+[deps]
+
+source_file="res://content/dialogue/zeus.dialogue"
+dest_files=["res://.godot/imported/zeus.dialogue-f9e24c43cbcd5fec4ac3635ca1034af5.tres"]
+
+[params]
+
+defaults=true

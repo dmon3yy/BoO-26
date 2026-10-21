@@ -1,0 +1,28 @@
+{
+  "_help": "Characters every .room file understands. Rooms can add their own in a [legend] section.",
+  "tiles": {
+    ".": "empty",
+    "#": "solid",
+    "%": "solid",
+    "=": "ledge",
+    "~": "fluid",
+    "^": "spikes"
+  },
+  "back": {
+    ".": "empty",
+    "b": "back"
+  },
+  "entities": {
+    "P": "player_start",
+    "H": "hearth",
+    "T": "torch",
+    "L": "lantern",
+    "o": "olive",
+    "A": "ambrosia",
+    "C": "column",
+    "c": "broken_column",
+    "Y": "olive_tree",
+    "F": "furnace",
+    "S": "song_seal"
+  }
+}

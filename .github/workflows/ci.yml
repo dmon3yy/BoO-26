@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.7.2"
+  PLAYWRIGHT_VERSION: "1.56.1"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Python tools and tests
+        run: |
+          pip install -r tools/requirements.txt
+          python -m pytest -q tests/python
+          python tools/validate_world.py
+
+      - name: Cache Godot
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}
+
+      - name: Download Godot and export templates
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot && cd ~/godot
+          base=https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable
+          curl -sSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && rm godot.zip
+          curl -sSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q templates.tpz && rm templates.tpz
+
+      - name: Install Godot
+        run: |
+          sudo ln -sf ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 /usr/local/bin/godot
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          cp -r ~/godot/templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb ffmpeg libgl1 libglx-mesa0 > /dev/null
+
+      - name: Import project
+        run: |
+          godot --headless --import || true
+          godot --headless --import
+
+      - name: Engine tests (GUT)
+        run: godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs -gexit
+
+      - name: A/V sync check (Movie Maker)
+        run: |
+          mkdir -p out/sync
+          BOO_SCENE=beat_lab BOO_LAB_SONG=metronome xvfb-run -a godot --path . --rendering-driver opengl3 \
+            --write-movie out/sync/f.png --fixed-fps 60 --quit-after 420
+          python tools/check_av_sync.py out/sync
+
+      - name: Review screenshots
+        run: |
+          mkdir -p out/shots
+          BOO_CAPTURE=$PWD/out/shots/arcadia BOO_CAPTURE_AT=40,260 BOO_INPUT="right@60-400" \
+            xvfb-run -a godot --path . --rendering-driver opengl3 --audio-driver Dummy
+          BOO_START_ROOM=erebos_01 BOO_CAPTURE=$PWD/out/shots/erebos BOO_CAPTURE_AT=40 \
+            xvfb-run -a godot --path . --rendering-driver opengl3 --audio-driver Dummy
+
+      - name: Export web builds
+        run: |
+          mkdir -p build/web/lite
+          godot --headless --export-release "Web" build/web/index.html
+          godot --headless --export-release "Web Lite" build/web/lite/index.html
+          rm -f build/web/*.import build/web/lite/*.import
+
+      - name: Browser smoke test
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y > /dev/null && npm i playwright@${PLAYWRIGHT_VERSION} > /dev/null
+          npx playwright install --with-deps chromium > /dev/null
+          cd "$GITHUB_WORKSPACE"
+          NODE_PATH=/tmp/pw/node_modules node tests/web/smoke.cjs build/web out/web_smoke
+          NODE_PATH=/tmp/pw/node_modules node tests/web/smoke.cjs build/web/lite out/web_smoke_lite
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: review
+          path: |
+            out/shots
+            out/web_smoke*.png
+            out/web_smoke*.json
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    # Publishes the playable build. One-time setup: Settings → Pages → Source: GitHub Actions,
+    # and allow this branch under Settings → Environments → github-pages.
+    if: github.event_name == 'push'
+    needs: build-and-test
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

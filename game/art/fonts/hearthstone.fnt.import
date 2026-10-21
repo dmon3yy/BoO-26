@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://i0863xqvgld2"
+path="res://.godot/imported/hearthstone.fnt-6076df6ca0586a7a8041d35c8c8107e3.fontdata"
+
+[deps]
+
+source_file="res://game/art/fonts/hearthstone.fnt"
+dest_files=["res://.godot/imported/hearthstone.fnt-6076df6ca0586a7a8041d35c8c8107e3.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2

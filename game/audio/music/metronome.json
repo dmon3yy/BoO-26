@@ -1,0 +1,13 @@
+{
+  "song": "metronome",
+  "bpm": 120.0,
+  "beats_per_bar": 4,
+  "offset": 0.0,
+  "bars": 2,
+  "loop_seconds": 4.0,
+  "loop_samples": 176400,
+  "swing": 0.0,
+  "stems": [
+    "res://game/audio/music/metronome_percussion.ogg"
+  ]
+}

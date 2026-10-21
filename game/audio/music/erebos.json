@@ -1,0 +1,15 @@
+{
+  "song": "erebos",
+  "bpm": 104.0,
+  "beats_per_bar": 4,
+  "offset": 0.0,
+  "bars": 8,
+  "loop_seconds": 18.46154195011338,
+  "loop_samples": 814154,
+  "swing": 0.33,
+  "stems": [
+    "res://game/audio/music/erebos_melody.ogg",
+    "res://game/audio/music/erebos_harmony.ogg",
+    "res://game/audio/music/erebos_percussion.ogg"
+  ]
+}

@@ -1,0 +1,42 @@
+; The Foundry Floor — Erebos, behind the Wall.
+id = erebos_01
+theme = erebos_works
+name = The Foundry Floor
+
+[map]
+############################################################
+############################################################
+###########.....................................############
+###########...............................................##
+###########...............................................##
+###########...........................................o...##
+###########.......................................========##
+##..................L.........F.......L...................##
+##........................%%%%%%%%%%%...........==........##
+##........................%%%%%%%%%%%.......L.........L...##
+##........L.........o.....%%%%%%%%%%%....######...........##
+##......%%%%%%.========...%%%%%%%%%%%...########..........##
+##......%%%%%%............%%%%%%%%%%%...########..........##
+##..P...%%%%%%............%%%%%%%%%%%...########....H.....##
+%%%%%%%%%%%%%%~~~~~~~~~~~~%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%############%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%############%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[back]
+............................................................
+............................................................
+...........bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb............
+...........bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb............
+...........bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb............
+...........bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb............
+...........bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb............
+..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+............................................................
+............................................................
+............................................................

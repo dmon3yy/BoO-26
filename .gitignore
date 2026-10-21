@@ -1,0 +1,17 @@
+# Godot
+.godot/
+/build/
+/android/
+export_credentials.cfg
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Review captures (Claude's screenshots and clips live outside the repo unless promoted to docs/)
+/out/
+
+# OS
+.DS_Store
+Thumbs.db
