@@ -1,0 +1,18 @@
+{
+  "_help": "Orpheus's movement, in pixels and seconds. The controller reads these numbers, the tests measure the controller against the 'limits', and the world validator uses the limits to decide which jumps are possible. Change a number here and all three stay in agreement.",
+  "run_speed": 112,
+  "ground_accel": 1100,
+  "ground_decel": 1400,
+  "air_accel": 800,
+  "gravity": 980,
+  "fall_gravity": 1350,
+  "max_fall": 320,
+  "jump_velocity": -318,
+  "jump_cut": 0.42,
+  "coyote_time": 0.09,
+  "jump_buffer": 0.12,
+  "limits": {
+    "jump_height_tiles": 3,
+    "jump_gap_tiles": 4
+  }
+}

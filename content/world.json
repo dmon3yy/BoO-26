@@ -1,0 +1,9 @@
+{
+  "_help": "Rooms sit on one global grid of screen-sized cells (30x17 tiles). A room's size must be a whole number of cells. Neighbouring rooms must line up their openings; tools/validate_world.py checks this.",
+  "cell": [30, 17],
+  "rooms": {
+    "arcadia_01": [0, 0],
+    "arcadia_02": [2, 0],
+    "erebos_01": [0, 8]
+  }
+}

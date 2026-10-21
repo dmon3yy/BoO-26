@@ -1,0 +1,50 @@
+; The Frozen Grove — Arcadia in unnatural winter.
+; D Dorian: minor, but with a raised sixth that keeps hope in it.
+; Original composition for Ballad of Orpheus.
+title = The Frozen Grove
+bpm = 84
+meter = 4
+key = D3
+mode = dorian
+bars = 8
+swing = 0.0
+
+[track lyre]
+instrument = lyre
+stem = melody
+octave = 1
+volume = 0.9
+| 5 . . 3 4 . 5 . 8 - - - 7 . 5 . |
+| 6 - 5 . 4 . 3 . 1 - - - . . . . |
+| 5 . . 3 4 . 5 . 8 - 9 - 10 - 8 . |
+| 7 - - - 6 . 5 . 6 - - - . . . . |
+| 3 . 4 . 5 . 6 . 7 - 6 . 5 - 3 . |
+| 4 - - - 3 . 1 . 2 - - - . . . . |
+| 5 . 5 . 8 - 7 . 6 . 5 . 4 . 3 . |
+| 1 - - - - - - - . . . . . . . . |
+
+[track pad]
+instrument = pad
+stem = harmony
+octave = 0
+volume = 0.55
+| 1 - - - - - - - 4 - - - - - - - |
+| 1 - - - - - - - 7 - - - - - - - |
+| 3 - - - - - - - 4 - - - - - - - |
+| 5 - - - - - - - 1 - - - - - - - |
+
+[track bass]
+instrument = bass
+stem = harmony
+octave = -1
+volume = 0.7
+| 1 - - - . . 1 . 4 - - - . . 4 . |
+| 1 - - - . . 1 . 7 - - - . . 7 . |
+| 3 - - - . . 3 . 4 - - - . . 4 . |
+| 5 - - - . . 5 . 1 - - - . . 5 . |
+
+[track drum]
+instrument = kit
+stem = percussion
+volume = 0.8
+| d . . . h . d . . . h . d . h . |

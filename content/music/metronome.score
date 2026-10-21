@@ -1,0 +1,13 @@
+; Metronome — a kick on every beat. Used by the Beat Lab and the A/V sync test.
+title = Metronome
+bpm = 120
+meter = 4
+key = C4
+mode = ionian
+bars = 2
+
+[track click]
+instrument = kit
+stem = percussion
+volume = 1.0
+| k . . . k . . . k . . . k . . . |

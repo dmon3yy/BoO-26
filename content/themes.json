@@ -1,0 +1,52 @@
+{
+  "_help": "A theme decides what the room's characters turn into: materials for solid tiles, the backdrop layers (factor = how fast they scroll), ambient light, weather and the fluid used by '~'.",
+  "arcadia_winter": {
+    "solid": {
+      "#": "limestone_snow",
+      "%": "marble_snow"
+    },
+    "back": {
+      "b": "limestone_back"
+    },
+    "ledge": "marble_ledge",
+    "fluid": "ice_water",
+    "ambient": [0.4, 0.45, 0.66],
+    "particles": "snow",
+    "music": "arcadia",
+    "backgrounds": [
+      {"tex": "arcadia_sky", "factor": 0.0, "glow": "arcadia_sky_e"},
+      {"tex": "arcadia_far", "factor": 0.1},
+      {"tex": "arcadia_mid", "factor": 0.22},
+      {"tex": "arcadia_grove", "factor": 0.45}
+    ],
+    "sky_light": {
+      "color": [0.55, 0.62, 0.9],
+      "energy": 0.55
+    },
+    "halos": [[372, 58, 70, [0.75, 0.8, 1.0, 0.35]]]
+  },
+  "erebos_works": {
+    "solid": {
+      "#": "basalt",
+      "%": "iron_plate"
+    },
+    "back": {
+      "b": "iron_back"
+    },
+    "ledge": "iron_grate",
+    "fluid": "molten",
+    "ambient": [0.34, 0.27, 0.29],
+    "particles": "embers",
+    "music": "erebos",
+    "backgrounds": [
+      {"tex": "erebos_cave", "factor": 0.0},
+      {"tex": "erebos_city", "factor": 0.12, "glow": "erebos_city_e"},
+      {"tex": "erebos_mid", "factor": 0.32}
+    ],
+    "sky_light": {
+      "color": [1.0, 0.45, 0.2],
+      "energy": 0.4
+    },
+    "glow_chance": 0.22
+  }
+}

@@ -1,0 +1,45 @@
+; The Foundry Floor — Erebos, behind the Wall.
+; A Locrian (the most unstable mode) over a swung shuffle; anvils on 2 and 4.
+; Original composition for Ballad of Orpheus.
+title = The Foundry Floor
+bpm = 104
+meter = 4
+key = A2
+mode = locrian
+bars = 8
+swing = 0.33
+
+[track horn]
+instrument = brass
+stem = melody
+octave = 1
+volume = 0.8
+| 5 - - - 4 . 3 . 2 - - - 1 . . . |
+| . . . . . . . . . . . . . . . . |
+| 3 - 4 - 5 - 6 - 5 - - - 3 . . . |
+| . . . . . . . . 2 . 1 . 2 - - - |
+
+[track stabs]
+instrument = brass
+stem = harmony
+octave = 0
+volume = 0.6
+| . . 1 . . . . . . . 3 . . . . . |
+| . . 2 . . . . . . . 1 . . . . . |
+
+[track bass]
+instrument = bass
+stem = harmony
+octave = -1
+volume = 0.85
+| 1 . . . 3 . . . 4 . . . 5 . . . |
+| 6 . . . 5 . . . 4 . . . 2 . . . |
+| 1 . . . 3 . . . 4 . . . 6 . . . |
+| 5 . . . 4 . . . 2 . . . 1 . . . |
+
+[track kit]
+instrument = kit
+stem = percussion
+volume = 0.9
+| k . . . a . h . k . h . a . h h |
+| k . . . a . h . k k h . a . h . |

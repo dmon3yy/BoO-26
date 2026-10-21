@@ -1,0 +1,28 @@
+{
+  "name": "Orpheus",
+  "notes": "Wine-red cloak so he reads against both blue winter and orange foundry; laurel green and lyre gold are his only bright accents.",
+  "colors": {
+    "h": "#24161a",
+    "H": "#40261f",
+    "g": "#3a6230",
+    "G": "#6f9a3c",
+    "s": "#9e6446",
+    "S": "#c98e62",
+    "T": "#e6b386",
+    "e": "#140c14",
+    "c": "#a39a8a",
+    "C": "#ddd4c0",
+    "b": "#2a4a80",
+    "B": "#4a78b8",
+    "r": "#3e1420",
+    "R": "#6c2232",
+    "Q": "#963443",
+    "l": "#3e2618",
+    "L": "#6e4628",
+    "n": "#4e3220",
+    "N": "#7a5233",
+    "y": "#7e5a1c",
+    "Y": "#d2a23c",
+    "w": "#f4e4a6"
+  }
+}
