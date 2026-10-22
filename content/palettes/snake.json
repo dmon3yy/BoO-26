@@ -1,0 +1,5 @@
+{
+  "name": "Snake",
+  "notes": "Mossy green with a yellow belly; red tongue.",
+  "colors": {"g": "#2c522a", "G": "#4f8a3a", "y": "#a89038", "Y": "#e0c860", "e": "#f6e070", "r": "#c43040"}
+}

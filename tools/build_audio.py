@@ -6,7 +6,7 @@
 For each score it writes game/audio/music/<name>_<stem>.ogg (one file per stem,
 all exactly the same length so they stay in sync) and <name>.json, the beat
 map the game's MusicClock reads. It also renders the lyre's single notes used
-for d-pad songs (game/audio/sfx/lyre_*.wav).
+for d-pad songs (game/audio/sfx/lyre_*.wav), plus the combat sounds.
 
 Score format (see content/music/arcadia.score for a full example):
 
@@ -354,11 +354,57 @@ def lyre_notes() -> None:
     print("sfx: lyre notes")
 
 
+def combat_sfx() -> None:
+    """Combat sounds, built from the drum kit's own pieces so they sit in the mix.
+    An on-beat hit adds a bright ping on top of the thud: you HEAR the bonus."""
+    rng = np.random.default_rng(23)
+
+    def t_(sec):
+        return np.arange(int(sec * SR)) / SR
+
+    def noise(sec, decay, hp=True):
+        n = rng.uniform(-1, 1, int(sec * SR)).astype(np.float32)
+        if hp:
+            n = n - lowpass(n, 3)
+        return n * np.exp(-t_(sec) * decay).astype(np.float32)
+
+    def mixdown(*parts):
+        n = max(len(p) for p in parts)
+        out = np.zeros(n, np.float32)
+        for p in parts:
+            out[: len(p)] += p
+        return out / (np.max(np.abs(out)) + 1e-9) * 0.8
+
+    t = t_(0.18)
+    whoosh = noise(0.18, 0, False) * np.sin(np.pi * t / 0.18).astype(np.float32) ** 2
+    whoosh = lowpass(whoosh, 6) * 0.5
+    thud = mixdown(kit("k", rng)[: int(0.2 * SR)], noise(0.12, 40) * 0.5)
+    ping = kit("a", rng)[: int(0.5 * SR)]
+    t = t_(0.5)
+    shimmer = (np.sin(2 * np.pi * 1760 * t) + 0.5 * np.sin(2 * np.pi * 2637 * t)) * np.exp(-t * 6)
+    t = t_(0.4)
+    fall = np.sin(2 * np.pi * np.cumsum(300 * np.exp(-t * 6)) / SR) * np.exp(-t * 7)
+    sounds = {
+        "club_swing": whoosh,
+        "club_hit": thud,
+        "club_hit_beat": mixdown(thud, ping * 0.7),
+        "parry": mixdown(ping[: int(0.25 * SR)] * 0.6, noise(0.1, 50) * 0.4),
+        "parry_perfect": mixdown(ping, shimmer.astype(np.float32) * 0.5),
+        "hurt": mixdown(kit("s", rng), kit("d", rng) * 0.8),
+        "enemy_die": mixdown(fall.astype(np.float32), noise(0.3, 12) * 0.4),
+        "spit": lowpass(noise(0.15, 25, False), 4) * 0.6,
+    }
+    for k, x in sounds.items():
+        write_wav(OUT_SFX / f"{k}.wav", x / (np.max(np.abs(x)) + 1e-9) * 0.7)
+    print("sfx: combat")
+
+
 def main(names: list[str]) -> None:
     targets = names or [p.stem for p in sorted(SCORES.glob("*.score"))]
     for n in targets:
         render(n)
     lyre_notes()
+    combat_sfx()
 
 
 if __name__ == "__main__":

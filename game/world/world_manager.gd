@@ -8,6 +8,8 @@ extends Node2D
 ##
 ## It also owns what happens *in* the world rather than to Orpheus himself:
 ## resting at Hearths, dying on hazards and respawning, and the auto-map.
+## Since M2 it also opens song seals, layers the music around fights, and
+## runs the HUD and pause menu.
 
 const VIEW := Vector2(480, 270)
 const SCROLL_TIME := 0.38
@@ -18,6 +20,8 @@ const BAND_UP := 56.0
 const BAND_DOWN := 20.0
 const HEARTH_REACH := 20.0
 const FADE_TIME := 0.3
+## Enemies this close (px) count as a fight: the drums come in.
+const FIGHT_RANGE := 180.0
 
 var cell_px: Vector2
 var room_cells: Dictionary = {}      # Vector2i grid cell -> room id
@@ -42,6 +46,10 @@ var _fade: ColorRect
 var _prompt: Label
 var _toast: Control
 var _map: MapScreen
+var _hud: Hud
+var _shake := 0.0
+var _last_hp := -1
+var _pause: PauseMenu
 
 
 func _ready() -> void:
@@ -87,6 +95,20 @@ func _ready() -> void:
 	_map = MapScreen.new()
 	_map.world = self
 	add_child(_map)
+	_hud = Hud.new()
+	_hud.camera = camera
+	add_child(_hud)
+	_pause = PauseMenu.new()
+	_pause.can_open = func(): return player != null and not _busy and not _transitioning \
+		and not is_instance_valid(_toast) and not _map.visible
+	_pause.closed.connect(func(): Music.play_theme(ContentDB.json("themes").get(_theme_id, {}).get("music", "")))
+	add_child(_pause)
+	Events.song_played.connect(_on_song_played)
+	# A small screen shake when Orpheus is hurt (Pause > Screen shake turns it off).
+	Events.player_hp_changed.connect(func(hp, _m):
+		if hp < _last_hp and Settings.screen_shake:
+			_shake = 0.18
+		_last_hp = hp)
 
 
 func start(room_id: String) -> void:
@@ -99,6 +121,7 @@ func start(room_id: String) -> void:
 	player.position = current.player_start if current.player_start != Vector2.ZERO \
 		else current.rect.get_center()
 	add_child(player)
+	_hud.player = player
 	_snap_camera()
 	camera.make_current()
 
@@ -250,14 +273,57 @@ func _physics_process(delta: float) -> void:
 	_update_camera(delta)
 	if player == null or _transitioning or _busy:
 		return
-	if _touching_hazard() or _fell_out_of_world():
+	if _touching_hazard() or _fell_out_of_world() or player.kit.is_dead():
 		die()
 		return
 	_update_hearth_prompt()
+	_layer_music()
 	if not current.rect.has_point(player.global_position + Vector2(0, -8)):
 		var next := room_at(player.global_position + Vector2(0, -8))
 		if next != "" and next != current.data.id:
 			_transition(next)
+
+
+# --- Songs and music ---------------------------------------------------------
+
+## A song was played at `at`. The Song of Zeus opens any song seal it reaches.
+func _on_song_played(id: String, at: Vector2) -> void:
+	var song: Dictionary = ContentDB.json("songs").get(id, {})
+	if song.get("effect", "") != "open_seals":
+		return
+	for room in rooms.values():
+		for seal_id in room.seals.keys():
+			var seal: Dictionary = room.seals[seal_id]
+			if seal["song"] == id and (seal["at"] as Vector2).distance_to(at) <= float(song.get("range", 96)):
+				_open_seal(room, seal_id)
+
+
+func _open_seal(room: Room, seal_id: String) -> void:
+	var seal: Dictionary = room.seals[seal_id]
+	room.seals.erase(seal_id)
+	GameState.collected[seal_id] = true
+	Burst.spawn(room, seal["at"] + Vector2(0, -24), Color(0.55, 0.82, 1.0), 40.0, 0.8)
+	for n in seal["nodes"]:
+		if n is CanvasItem:
+			var tw := create_tween()
+			tw.tween_property(n, "modulate:a", 0.0, 0.6)
+			tw.tween_callback(n.queue_free)
+		else:
+			n.queue_free()     # the collision goes at once, so he can walk through
+
+
+## Drums come in when enemies are near; the melody steps back while
+## Orpheus plays, so his lyre carries the tune.
+func _layer_music() -> void:
+	var fighting := false
+	for e in get_tree().get_nodes_in_group(&"enemies"):
+		if not e.is_harmless() and e.global_position.distance_to(player.global_position) < FIGHT_RANGE:
+			fighting = true
+			break
+	Music.mix({
+		"percussion": 1.0 if fighting else 0.35,
+		"melody": 0.3 if player.kit.state == "lyre" else 1.0,
+	})
 
 
 # --- Hazards, death and respawn ---------------------------------------------
@@ -300,6 +366,7 @@ func die() -> void:
 	await _fade_to(1.0)
 	var spawn := respawn_point()
 	place_player(spawn[0], spawn[1])
+	player.kit.restore()
 	await get_tree().create_timer(0.25).timeout
 	await _fade_to(0.0)
 	player.frozen = false
@@ -344,7 +411,7 @@ func _nearest_hearth() -> Vector2:
 
 func _update_hearth_prompt() -> void:
 	var h := _nearest_hearth()
-	_prompt.visible = h != Vector2.INF and not is_instance_valid(_toast)
+	_prompt.visible = h != Vector2.INF and not is_instance_valid(_toast) and player.kit.state == "free"
 	if not _prompt.visible:
 		return
 	_prompt.text = "UP: rest"
@@ -363,6 +430,7 @@ func rest_at(h: Vector2) -> void:
 	var local: Vector2 = (h - room_origin[current.data.id]) / RoomData.TILE
 	GameState.hearth_id = "%s:hearth_%d_%d" % [current.data.id, floori(local.x), floori(local.y) - 1]
 	GameState.room_id = current.data.id
+	player.kit.restore(true)
 	Save.save_game(0)
 	Events.hearth_rested.emit(GameState.hearth_id)
 	_show_word(Save.make_word())
@@ -422,6 +490,9 @@ func _update_camera(delta: float) -> void:
 	if not _transitioning:
 		_cam_pos = _cam_pos.lerp(_camera_target(), 1.0 - exp(-delta * 8.0))
 	camera.position = _cam_pos.round()
+	if _shake > 0.0:
+		_shake -= delta
+		camera.position += Vector2(randf_range(-3, 3), randf_range(-2, 2)).round()
 	var top_left := camera.position - VIEW * 0.5
 	for i in _bg_sprites.size():
 		var f := _bg_factors[i]

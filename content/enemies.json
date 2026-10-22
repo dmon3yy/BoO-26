@@ -1,0 +1,38 @@
+{
+  "_help": "Enemies, in pixels, seconds and hit points. Enemies move freely but ATTACK ON THE BEAT: a wind-up starts on one beat and strikes on a later one, so the music tells you when to dodge or parry. 'olive_drop' is unused until olives arrive in M3.",
+  "satyr": {
+    "char": "s",
+    "rig": "satyr",
+    "hp": 6,
+    "contact_damage": 2,
+    "walk_speed": 34,
+    "charge_speed": 190,
+    "sight": [150, 40],
+    "windup_beats": 1,
+    "charge_time": 0.55,
+    "rest_beats": 2,
+    "size": [14, 28]
+  },
+  "bat": {
+    "char": "v",
+    "rig": "bat",
+    "hp": 2,
+    "contact_damage": 1,
+    "sight": 110,
+    "swoop_speed": 130,
+    "swoop_beats": 2,
+    "rest_beats": 2,
+    "size": [12, 8]
+  },
+  "snake": {
+    "char": "n",
+    "rig": "snake",
+    "hp": 4,
+    "contact_damage": 2,
+    "sight": 200,
+    "spit_every_beats": 4,
+    "spit_speed": 110,
+    "spit_damage": 2,
+    "size": [18, 12]
+  }
+}

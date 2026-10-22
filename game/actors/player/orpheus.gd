@@ -1,6 +1,7 @@
 class_name Orpheus
 extends CharacterBody2D
-## Orpheus: movement, animation and his small personal light.
+## Orpheus: movement, animation and his small personal light. His fighting
+## kit (club, dodge, parry, health, lyre) lives in kit.gd, a child node.
 ##
 ## The physics lives in `step_motion` — a pure function of (velocity, input,
 ## time) — so tests and the world validator use exactly the same numbers as
@@ -17,6 +18,7 @@ var anims: Dictionary
 var facing := 1
 var anim := "idle"
 var frozen := false
+var kit: OrpheusKit
 
 ## Optional stand-in for the keyboard/gamepad, used by replay tests and the
 ## screenshot tool. Must provide axis() -> float, held(action) and pressed(action).
@@ -35,8 +37,8 @@ const DROP_TIME := 0.25
 func _ready() -> void:
 	move = ContentDB.json("movement")
 	z_index = 5
-	collision_layer = 4
-	collision_mask = 1 | 2
+	collision_layer = Layers.PLAYER
+	collision_mask = Layers.SOLID | Layers.LEDGE
 	floor_snap_length = 4.0
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
@@ -63,6 +65,10 @@ func _ready() -> void:
 	glow.position = Vector2(0, -18)
 	glow.height = 30.0
 	add_child(glow)
+
+	kit = OrpheusKit.new(self)
+	add_child(kit)
+	add_to_group(&"player")
 
 
 ## Advance velocity by one tick. `input_x` is -1..1, `jump_held` keeps the
@@ -95,20 +101,21 @@ static func step_motion(v: Vector2, input_x: float, on_floor: bool, jump_held: b
 func _physics_process(delta: float) -> void:
 	if frozen:
 		return
-	var x := _axis()
+	kit.tick(delta)
+	var x := 0.0 if kit.movement_locked() else _axis()
 	var on_floor := is_on_floor()
 	if on_floor:
 		_coyote = float(move["coyote_time"])
 	else:
 		_coyote -= delta
-	if _pressed(&"jump"):
+	if _pressed(&"jump") and not kit.jump_locked():
 		_buffer = float(move["jump_buffer"])
 	else:
 		_buffer -= delta
 
 	# Down + Jump on a ledge drops through it instead of jumping.
 	_drop_time -= delta
-	if on_floor and _held(&"down") and _pressed(&"jump") and on_ledge():
+	if on_floor and _held(&"down") and _pressed(&"jump") and not kit.jump_locked() and on_ledge():
 		_drop_time = DROP_TIME
 		_buffer = 0.0
 		_coyote = 0.0
@@ -123,6 +130,7 @@ func _physics_process(delta: float) -> void:
 
 	var released := _was_jump_held and not _held(&"jump")
 	velocity = step_motion(velocity, x, on_floor, _held(&"jump"), move, delta, released)
+	velocity = kit.override_velocity(velocity)
 	if velocity.y < 0.0:
 		_nudge_around_ceiling_corner(delta)
 	var fall_speed := velocity.y
@@ -132,7 +140,7 @@ func _physics_process(delta: float) -> void:
 		if fall_speed > float(move["hard_landing_speed"]):
 			_dust()
 	_was_jump_held = _held(&"jump")
-	if absf(x) > 0.01:
+	if absf(x) > 0.01 and kit.state == "free":
 		facing = 1 if x > 0 else -1
 	_was_on_floor = on_floor
 	_animate(delta, x)
@@ -189,11 +197,14 @@ func _dust() -> void:
 
 
 func _animate(delta: float, x: float) -> void:
-	var want := "idle"
-	if not is_on_floor():
-		want = "jump" if velocity.y < 0.0 else "fall"
-	elif absf(velocity.x) > 8.0:
-		want = "run"
+	var want := kit.anim_override()     # attacking, dodging, parrying, playing...
+	if want == "":
+		if not is_on_floor():
+			want = "jump" if velocity.y < 0.0 else "fall"
+		elif absf(velocity.x) > 8.0:
+			want = "run"
+		else:
+			want = "idle"
 	if want != anim:
 		anim = want
 		_anim_time = 0.0
@@ -210,6 +221,28 @@ func _animate(delta: float, x: float) -> void:
 ## keyboard, gamepad or scripted controls as Orpheus does.
 func just_pressed(action: StringName) -> bool:
 	return _pressed(action)
+
+
+func pressed(action: StringName) -> bool:
+	return _pressed(action)
+
+
+func held(action: StringName) -> bool:
+	return _held(action)
+
+
+func input_x() -> float:
+	return _axis()
+
+
+## The rectangle enemies and venom have to touch to hurt him.
+func hurtbox() -> Rect2:
+	return Rect2(global_position + Vector2(-5, -30), Vector2(10, 30))
+
+
+## Start the current animation over (each swing replays the swing).
+func restart_anim() -> void:
+	anim = ""
 
 
 func _axis() -> float:

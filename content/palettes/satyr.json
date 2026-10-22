@@ -1,0 +1,10 @@
+{
+  "name": "Satyr",
+  "notes": "Goat-brown fur and tan skin; the yellow goat eye is the one bright spot, so you can read which way he faces.",
+  "colors": {
+    "f": "#3a261a", "F": "#6b4a30",
+    "k": "#8a5838", "K": "#b98060", "t": "#dca47c",
+    "o": "#7c7060", "O": "#d6c9a8",
+    "e": "#f2d040", "d": "#2a1c14", "x": "#181012"
+  }
+}

@@ -30,6 +30,9 @@ var offset := 0.0               # seconds from stream start to beat 0
 var loop_length := 0.0          # seconds; 0 = no loop
 
 var _stems: Array[AudioStreamPlayer] = []
+var _stem_names: Array[String] = []     # "melody", "harmony", "percussion"
+var _mix_target: Dictionary = {}       # stem name -> 0..1
+var _mix_now: Dictionary = {}
 var _playing := false
 var _clock := 0.0               # smoothed song time, seconds since stream start
 var _laps := 0                  # completed loops, so beat indices keep rising
@@ -60,7 +63,9 @@ func play_song(id: String, stem_paths: Array, beat_map: Dictionary) -> void:
 	beats_per_bar = int(beat_map.get("beats_per_bar", 4))
 	offset = float(beat_map.get("offset", 0.0))
 	loop_length = float(beat_map.get("loop_seconds", 0.0))
+	_stem_names.clear()
 	for path in stem_paths:
+		_stem_names.append(String(path).get_file().get_basename().get_slice("_", 1))
 		var p := AudioStreamPlayer.new()
 		var stream: AudioStream = load(path)
 		if stream is AudioStreamOggVorbis:
@@ -100,6 +105,28 @@ func _exit_tree() -> void:
 func set_stem_volume(index: int, linear: float) -> void:
 	if index < _stems.size():
 		_stems[index].volume_db = linear_to_db(maxf(linear, 0.0001))
+
+
+## Stem layering: fade each stem toward a level, e.g.
+## mix({"percussion": 1.0, "melody": 0.4}). Stems not named keep their level.
+## The world calls this every frame: drums come in when a fight starts, and
+## the melody steps back while Orpheus plays his lyre.
+func mix(levels: Dictionary) -> void:
+	_mix_target.merge(levels, true)
+
+
+const MIX_RATE := 1.5          # how fast stems fade, in full volume per second
+
+
+func _fade_stems(delta: float) -> void:
+	for i in _stems.size():
+		var stem := _stem_names[i]
+		if not _mix_target.has(stem):
+			continue
+		var now: float = _mix_now.get(stem, 1.0)
+		now = move_toward(now, float(_mix_target[stem]), MIX_RATE * delta)
+		_mix_now[stem] = now
+		set_stem_volume(i, now)
 
 
 func is_playing() -> bool:
@@ -153,6 +180,7 @@ static func grade_delta(delta: float, assist: bool) -> Grade:
 func _process(delta: float) -> void:
 	if not _playing:
 		return
+	_fade_stems(delta)
 	_clock += delta
 	var audio := _audio_position()
 	if audio >= 0.0:
