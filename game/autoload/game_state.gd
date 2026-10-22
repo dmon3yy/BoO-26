@@ -19,10 +19,17 @@ var dropped_olives := {}              # {"room": String, "x": float, "y": float,
 var play_time := 0.0
 
 
+func _init() -> void:
+	reset()
+
+
+## A fresh playthrough, holding whatever content/new_game.json starts him with.
 func reset() -> void:
 	olives = 0
 	max_hp = 12
 	abilities.clear()
+	for a in ContentDB.json("new_game").get("abilities", []):
+		abilities[StringName(a)] = true
 	flags.clear()
 	collected.clear()
 	verses.clear()

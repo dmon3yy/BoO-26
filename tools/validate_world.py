@@ -208,7 +208,9 @@ def check_edges(w: World, rep: Report) -> None:
 
 def solve(w: World, rep: Report) -> None:
     starts = [(e["x"], e["y"]) for e in w.entities if e["kind"] == "player_start"]
-    abilities: frozenset = frozenset()
+    # Orpheus starts with whatever content/new_game.json gives him.
+    start_kit = load_json("new_game", w.base) if (w.base / "new_game.json").exists() else {}
+    abilities: frozenset = frozenset(start_kit.get("abilities", []))
     rounds = []
     while True:
         stands, graph, gates = w.reachable(starts, abilities)
@@ -227,7 +229,8 @@ def solve(w: World, rep: Report) -> None:
 
     # Everything that matters must be reachable with the final abilities.
     for e in w.entities:
-        if e["kind"] in ("player_start", "torch", "lantern", "column", "broken_column", "olive_tree"):
+        if e["kind"] in ("player_start", "torch", "lantern", "column", "broken_column", "olive_tree",
+                         "satyr", "bat", "snake"):
             continue
         need = w.needs(e)
         if need:

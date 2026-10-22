@@ -31,7 +31,37 @@
       "count": 2,
       "fps": 8,
       "loop": false
+    },
+    "attack": {
+      "start": 20,
+      "count": 6,
+      "fps": 30,
+      "loop": false
+    },
+    "dodge": {
+      "start": 26,
+      "count": 2,
+      "fps": 10,
+      "loop": true
+    },
+    "parry": {
+      "start": 28,
+      "count": 2,
+      "fps": 8,
+      "loop": true
+    },
+    "hurt": {
+      "start": 30,
+      "count": 2,
+      "fps": 8,
+      "loop": false
+    },
+    "play": {
+      "start": 32,
+      "count": 8,
+      "fps": 8,
+      "loop": true
     }
   },
-  "frames": 20
+  "frames": 40
 }

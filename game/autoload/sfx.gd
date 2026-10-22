@@ -16,6 +16,11 @@ func _ready() -> void:
 		_pool.append(p)
 
 
+## Play one of the built sound effects by name: Sfx.hit("club_hit").
+func hit(sound: String, volume_db: float = 0.0, pitch: float = 1.0) -> void:
+	play("res://game/audio/sfx/%s.wav" % sound, volume_db, pitch)
+
+
 func play(path: String, volume_db: float = 0.0, pitch: float = 1.0) -> void:
 	if not _cache.has(path):
 		if not ResourceLoader.exists(path):

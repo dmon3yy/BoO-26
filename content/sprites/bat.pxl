@@ -1,0 +1,23 @@
+; A cave bat, facing right.   m/M body  W/w wing  e eye
+
+@body
+m...m
+mMMMm
+MeMeM
+mMMMm
+.mMm.
+..m..
+
+@wing_r
+WWw.....
+WWWWw...
+.WWWWWw.
+.W.WW.Ww
+.....W.w
+
+@wing_l
+.....wWW
+...wWWWW
+.wWWWWW.
+wW.WW.W.
+w.W.....

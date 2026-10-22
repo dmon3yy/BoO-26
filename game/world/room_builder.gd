@@ -278,6 +278,7 @@ static func _build_entities(room: Room, data: RoomData) -> void:
 	var legend := ContentDB.json("legend")
 	var entity_kinds: Dictionary = legend.get("entities", {})
 	var props := ContentDB.json("props")
+	var enemies := ContentDB.json("enemies")
 	for y in data.height:
 		for x in data.width:
 			var ch := data.char_at(x, y)
@@ -292,19 +293,32 @@ static func _build_entities(room: Room, data: RoomData) -> void:
 			match kind:
 				"player_start":
 					room.player_start = room.position + foot
+				_ when enemies.has(kind):
+					var e := Enemy.create(kind)
+					e.position = foot
+					room.add_child(e)
 				_:
 					if kind == "hearth":
 						room.hearths.append(room.position + foot)
+					var entity_id := "%s:%s_%d_%d" % [data.id, kind, x, y]
+					if kind == "song_seal" and GameState.collected.has(entity_id):
+						continue     # already sung open
 					if props.has(kind):
-						_spawn_prop(room, props[kind], foot, "%s:%s_%d_%d" % [data.id, kind, x, y])
+						var made := _spawn_prop(room, props[kind], foot, entity_id)
+						if kind == "song_seal":
+							var params: Dictionary = data.legend[ch]["params"] if data.legend.has(ch) else {}
+							room.seals[entity_id] = {"song": params.get("song", ""), "at": room.position + foot,
+								"nodes": made}
 
 
-static func _spawn_prop(room: Room, spec: Dictionary, foot: Vector2, entity_id: String) -> void:
+## Builds a prop and returns every node it made (so a seal can be removed).
+static func _spawn_prop(room: Room, spec: Dictionary, foot: Vector2, entity_id: String) -> Array[Node]:
+	var made: Array[Node] = []
 	var base: String = PROPS + spec["texture"]
 	var sprite: Sprite2D = BobSprite.new() if spec.get("bob", false) else Sprite2D.new()
 	sprite.texture = ContentDB.lit_texture(base)
 	if sprite.texture == null:
-		return
+		return made
 	var size := sprite.texture.get_size()
 	var anchor := foot
 	if spec.get("hang", false):
@@ -313,6 +327,7 @@ static func _spawn_prop(room: Room, spec: Dictionary, foot: Vector2, entity_id: 
 	sprite.z_index = int(spec.get("z", 0))
 	sprite.set_meta("entity_id", entity_id)
 	room.add_child(sprite)
+	made.append(sprite)
 	if spec.get("emissive", false):
 		var glow := Sprite2D.new()
 		glow.texture = ContentDB.texture(base + "_e.png")
@@ -320,15 +335,20 @@ static func _spawn_prop(room: Room, spec: Dictionary, foot: Vector2, entity_id: 
 		glow.position = sprite.position
 		glow.z_index = sprite.z_index
 		room.add_child(glow)
+		made.append(glow)
 	for f in spec.get("flame", []):
 		var fl := FxNodes.flame(anchor + Vector2(f[0], f[1]))
 		fl.z_index = sprite.z_index + 1
 		room.add_child(fl)
+		made.append(fl)
 	for l in spec.get("lights", []):
 		var at: Vector2 = anchor + Vector2(l["offset"][0], l["offset"][1])
-		room.add_child(FxNodes.light(at, l))
+		var light := FxNodes.light(at, l)
+		room.add_child(light)
 		var c: Array = l.get("color", [1, 1, 1])
-		room.add_child(FxNodes.halo(at, Color(c[0], c[1], c[2], 0.7), float(l.get("halo", 28.0 * float(l.get("scale", 1.0))))))
+		var halo := FxNodes.halo(at, Color(c[0], c[1], c[2], 0.7), float(l.get("halo", 28.0 * float(l.get("scale", 1.0)))))
+		room.add_child(halo)
+		made.append_array([light, halo])
 	if spec.get("solid", false):
 		var body := StaticBody2D.new()
 		var shape := CollisionShape2D.new()
@@ -338,6 +358,8 @@ static func _spawn_prop(room: Room, spec: Dictionary, foot: Vector2, entity_id: 
 		body.position = sprite.position
 		body.add_child(shape)
 		room.add_child(body)
+		made.append(body)
+	return made
 
 
 class BobSprite:

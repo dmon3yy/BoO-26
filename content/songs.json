@@ -1,0 +1,27 @@
+{
+  "_help": "Songs for the lyre. Hold Lyre, then play the notes with Up / Down / Left / Right (Jump plays the middle string). A song only works once Orpheus knows it (ability 'song:<id>'). Traversal songs are free; combat songs cost Muse. 'range' is how far (px) the song reaches. Notes don't have to be on the beat, but a combat song played entirely on the beat costs half.",
+  "zeus": {
+    "name": "Song of Zeus",
+    "notes": ["up", "left", "right", "up"],
+    "kind": "traversal",
+    "range": 96,
+    "effect": "open_seals"
+  },
+  "charm": {
+    "name": "Song of Charming",
+    "notes": ["down", "left", "down", "right"],
+    "kind": "combat",
+    "cost": 50,
+    "range": 200,
+    "effect": "charm",
+    "seconds": 4.0
+  },
+  "hymn": {
+    "name": "Calliope's Hymn",
+    "notes": ["left", "right", "middle", "up"],
+    "kind": "combat",
+    "cost": 40,
+    "effect": "heal",
+    "amount": 4
+  }
+}

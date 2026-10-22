@@ -1,0 +1,28 @@
+; A rock snake, facing right. It spits venom on the bar line.
+;   g/G scales  y/Y belly  e eye  r tongue
+
+@coil
+....gGGGGg....
+..gGGyYYGGGg..
+.gGyYYYYYYGGg.
+gGGGGGGGGGGGGg
+.gggggggggggg.
+
+@neck
+.gG.
+.gGg
+gGYg
+gGYg
+gGYg
+.gGY
+.gGY
+gGGY
+gGGg
+.gg.
+
+@head
+..gGGGg..
+.gGGeGGG.
+gGGGGGGGr
+.gyyyyg..
+..ggg....

@@ -1,0 +1,25 @@
+{
+  "frame_size": [
+    24,
+    18
+  ],
+  "origin": [
+    11,
+    15
+  ],
+  "anims": {
+    "fly": {
+      "start": 0,
+      "count": 4,
+      "fps": 12,
+      "loop": true
+    },
+    "hang": {
+      "start": 4,
+      "count": 2,
+      "fps": 2,
+      "loop": true
+    }
+  },
+  "frames": 6
+}
