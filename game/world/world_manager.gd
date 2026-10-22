@@ -374,21 +374,28 @@ func rest_at(h: Vector2) -> void:
 func _show_word(word: String) -> void:
 	if is_instance_valid(_toast):
 		_toast.queue_free()
-	var box := Rect2(40, 20, 400, 0)
 	# Spaces between the groups let the Word wrap; reading a Word ignores them.
 	var shown := word.replace("-", " ")
-	var text := UiKit.label(shown, Vector2.ZERO, UiKit.INK, box.size.x - 16)
-	var per_line := floori((box.size.x - 16) / 36.0) * 6      # whole 6-character groups
-	box.size.y = 28 + ceili(shown.length() / float(per_line)) * 10
+	var box := Rect2(40, 20, 400, 0)
+	var text := UiKit.label(shown, Vector2(8, 18), UiKit.INK, box.size.x - 16)
+	var per_line := floori((box.size.x - 16) / 30.0) * 5      # whole 5-character groups
+	box.size.y = 40 + ceili(shown.length() / float(per_line)) * 10
 	_toast = UiKit.panel(box)
 	_toast.add_child(UiKit.label("Hestia's Hearth. Rested and saved. Your Word:", Vector2(8, 5), UiKit.GOLD))
-	text.position = Vector2(8, 18)
 	_toast.add_child(text)
+	_toast.add_child(UiKit.label("Jump or Esc: close", Vector2(8, box.size.y - 13), UiKit.GOLD.darkened(0.3)))
 	_prompt.get_parent().add_child(_toast)
 	var toast := _toast
-	await get_tree().create_timer(6.0).timeout
-	if is_instance_valid(toast):
-		toast.queue_free()
+	var shown_at := Time.get_ticks_msec()
+	# Stays until dismissed, or until you walk away from the Hearth.
+	var hearth := player.global_position
+	while is_instance_valid(toast):
+		await get_tree().process_frame
+		if Time.get_ticks_msec() - shown_at < 300:
+			continue     # don't let the button that started it also close it
+		if player.just_pressed(&"jump") or player.just_pressed(&"pause") \
+				or player.global_position.distance_to(hearth) > 48.0:
+			toast.queue_free()
 
 
 func _transition(next: String) -> void:

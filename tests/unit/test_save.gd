@@ -50,6 +50,39 @@ func test_word_of_the_gods_round_trip() -> void:
 	assert_true(GameState.has_ability(&"sandals"))
 
 
+func test_word_keeps_everything_that_matters() -> void:
+	_fill_state()
+	GameState.max_hp = 16
+	GameState.verses.append(9)
+	GameState.season = &"thaw"
+	GameState.visited_rooms["arcadia_01"] = true
+	GameState.visited_rooms["erebos_01"] = true
+	GameState.hearth_id = "arcadia_05:hearth_8_29"
+	var word := Save.make_word()
+	GameState.reset()
+	assert_eq(Save.read_word(word), OK)
+	assert_eq(GameState.max_hp, 16)
+	assert_true(GameState.get_flag(&"met_zeus"))
+	assert_eq(GameState.verses, [1, 9])
+	assert_eq(GameState.season, &"thaw")
+	assert_true(GameState.visited_rooms.has("erebos_01"))
+	assert_eq(GameState.hearth_id, "arcadia_05:hearth_8_29")
+	assert_eq(GameState.room_id, "arcadia_05")
+
+
+func test_word_is_short_enough_to_copy() -> void:
+	_fill_state()
+	GameState.hearth_id = "arcadia_05:hearth_8_29"
+	for id in ContentDB.json("world")["rooms"]:
+		GameState.visited_rooms[id] = true
+	var word := Save.make_word()
+	assert_lt(word.replace("-", "").length(), 30, word)
+
+
+func test_every_hearth_has_a_number() -> void:
+	assert_true(Save.world_index()["hearths"].has("arcadia_05:hearth_8_29"))
+
+
 func test_word_forgives_case_and_lookalikes() -> void:
 	_fill_state()
 	var word := Save.make_word().to_lower().replace("0", "o").replace("1", "l")
