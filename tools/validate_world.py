@@ -227,7 +227,7 @@ def solve(w: World, rep: Report) -> None:
 
     # Everything that matters must be reachable with the final abilities.
     for e in w.entities:
-        if e["kind"] in ("player_start", "torch", "lantern", "column", "broken_column", "olive_tree", "furnace"):
+        if e["kind"] in ("player_start", "torch", "lantern", "column", "broken_column", "olive_tree"):
             continue
         need = w.needs(e)
         if need:

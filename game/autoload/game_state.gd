@@ -66,14 +66,16 @@ func add_olives(amount: int) -> void:
 	Events.olives_changed.emit(olives)
 
 
-## Souls-lite death: olives stay where you fell. Dying again before you reach
-## them overwrites the old pile, so the first one is lost.
+## Souls-lite death: half your olives (rounded up) stay where you fell; you
+## keep the rest. Dying again before you reach them overwrites the old pile,
+## so the first one is lost.
 func drop_olives_on_death(room: String, at: Vector2) -> void:
-	if olives > 0:
-		dropped_olives = {"room": room, "x": at.x, "y": at.y, "amount": olives}
+	var dropped := ceili(olives / 2.0)
+	if dropped > 0:
+		dropped_olives = {"room": room, "x": at.x, "y": at.y, "amount": dropped}
 	else:
 		dropped_olives = {}
-	olives = 0
+	olives -= dropped
 	Events.olives_changed.emit(olives)
 
 

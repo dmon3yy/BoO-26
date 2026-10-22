@@ -17,6 +17,7 @@ var controls := ScriptedControls.new()
 
 func _ready() -> void:
 	process_priority = -100
+	process_mode = Node.PROCESS_MODE_ALWAYS     # keep counting while the map pauses the game
 	process_physics_priority = -100
 	_prefix = OS.get_environment("BOO_CAPTURE")
 	for s in OS.get_environment("BOO_CAPTURE_AT").split(",", false):

@@ -1,0 +1,14 @@
+{
+  "_help": "The Word of the Gods packs a save into a short code by numbering things instead of spelling them out. Each list below gives every ability, flag and season a fixed position. APPEND ONLY: never reorder or delete an entry, or old Words will read back wrong. Hearths, rooms and keepsakes are numbered from world.json order (new rooms go at the end), so add rooms to the end of world.json too. Olives lying in rooms are not in the Word (they come back if you restore from one); your olive count is.",
+  "abilities": [
+    "lyre", "club", "song:zeus", "sandals", "shield", "staff", "key_athens", "fire",
+    "harp", "song:pegasus", "sword", "song:dolphin", "eye", "divine_sword", "golden_apple", "bracelet",
+    "salamander_shield", "moon_crystal", "song:seasons"
+  ],
+  "flags": [
+    "met_zeus", "met_hermes", "met_athena", "met_demeter", "met_prometheus", "met_apollo", "met_poseidon", "met_gaea",
+    "met_hephaestus", "met_ares", "met_artemis", "met_persephone"
+  ],
+  "seasons": ["winter", "thaw"],
+  "keepsake_kinds": ["ambrosia"]
+}

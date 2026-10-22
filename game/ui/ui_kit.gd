@@ -27,6 +27,7 @@ static func label(text: String, pos: Vector2, color: Color = INK, width: float =
 	l.add_theme_constant_override("shadow_offset_x", 1)
 	l.add_theme_constant_override("shadow_offset_y", 1)
 	if width > 0.0:
+		l.custom_minimum_size.x = width     # size alone is reset when the text lays out
 		l.size.x = width
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l

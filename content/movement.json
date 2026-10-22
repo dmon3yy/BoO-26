@@ -1,16 +1,21 @@
 {
-  "_help": "Orpheus's movement, in pixels and seconds. The controller reads these numbers, the tests measure the controller against the 'limits', and the world validator uses the limits to decide which jumps are possible. Change a number here and all three stay in agreement.",
+  "_help": "Orpheus's movement, in pixels and seconds (turn_accel: how hard he brakes when reversing; apex_*: the brief float at the top of a held jump; corner_nudge: how many pixels he slides around a ceiling corner instead of bonking). The controller reads these numbers, the tests measure the controller against the 'limits', and the world validator uses the limits to decide which jumps are possible. Change a number here and all three stay in agreement.",
   "run_speed": 112,
   "ground_accel": 1100,
   "ground_decel": 1400,
+  "turn_accel": 2400,
   "air_accel": 800,
   "gravity": 980,
   "fall_gravity": 1350,
+  "apex_window": 45,
+  "apex_gravity_scale": 0.55,
   "max_fall": 320,
   "jump_velocity": -318,
   "jump_cut": 0.42,
   "coyote_time": 0.09,
   "jump_buffer": 0.12,
+  "corner_nudge": 5,
+  "hard_landing_speed": 230,
   "limits": {
     "jump_height_tiles": 3,
     "jump_gap_tiles": 4

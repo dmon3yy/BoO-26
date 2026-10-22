@@ -237,7 +237,22 @@ def song_seal():
     c.save("song_seal", emissive=True)
 
 
+def spikes(name: str, palette: str, ramp: list[str]):
+    """A tile of upward shards: icicles in Arcadia, iron stakes in Erebos ('^' in a room)."""
+    p = load_palette(palette)
+    W, H = 16, 16
+    c = Canvas(W, H)
+    for cx, top in ((2.5, 5), (6.5, 2), (10.5, 6), (13.5, 3)):
+        half = (c.ys - top) / (H - top) * 2.2 + 0.4
+        shard = (np.abs(c.xs + 0.5 - cx) <= half) & (c.ys >= top)
+        tone = np.clip(0.8 - 0.5 * (c.xs + 0.5 - cx + 1.2) / 3.0, 0, 0.999)
+        c.paint(shard, ramp_pick(p, ramp, tone), 0.3 + 0.7 * (1 - np.abs(c.xs + 0.5 - cx) / 3.0))
+    c.save(name)
+
+
 def main():
+    spikes("spikes_ice", "arcadia_winter", ["ice0", "ice1", "ice2", "snow2"])
+    spikes("spikes_iron", "erebos", ["iron1", "iron2", "iron3", "iron4"])
     column(False)
     column(True)
     olive_tree()

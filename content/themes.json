@@ -9,6 +9,7 @@
       "b": "limestone_back"
     },
     "ledge": "marble_ledge",
+    "spikes": "spikes_ice",
     "fluid": "ice_water",
     "ambient": [0.4, 0.45, 0.66],
     "particles": "snow",
@@ -25,6 +26,32 @@
     },
     "halos": [[372, 58, 70, [0.75, 0.8, 1.0, 0.35]]]
   },
+  "arcadia_cave": {
+    "solid": {
+      "#": "limestone_snow",
+      "%": "marble_snow"
+    },
+    "back": {
+      "b": "limestone_back"
+    },
+    "ledge": "marble_ledge",
+    "spikes": "spikes_ice",
+    "fluid": "ice_water",
+    "ambient": [0.3, 0.32, 0.46],
+    "particles": "",
+    "music": "arcadia",
+    "backgrounds": [
+      {"tex": "arcadia_sky", "factor": 0.0, "glow": "arcadia_sky_e"},
+      {"tex": "arcadia_far", "factor": 0.1},
+      {"tex": "arcadia_mid", "factor": 0.22},
+      {"tex": "arcadia_grove", "factor": 0.45}
+    ],
+    "sky_light": {
+      "color": [0.55, 0.62, 0.9],
+      "energy": 0.0
+    },
+    "halos": []
+  },
   "erebos_works": {
     "solid": {
       "#": "basalt",
@@ -34,6 +61,7 @@
       "b": "iron_back"
     },
     "ledge": "iron_grate",
+    "spikes": "spikes_iron",
     "fluid": "molten",
     "ambient": [0.34, 0.27, 0.29],
     "particles": "embers",

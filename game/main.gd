@@ -1,6 +1,6 @@
 extends Node2D
-## Entry point. For M0 this boots straight into the world so the art-bar rooms
-## can be walked; a title screen arrives in M3.
+## Entry point. Boots straight into the world, continuing from the last
+## Hearth if there's a save; a title screen arrives in M3.
 ##
 ## Environment switches (used by tools and CI, ignored otherwise):
 ##   BOO_START_ROOM  start in a specific room
@@ -25,7 +25,13 @@ func _ready() -> void:
 	world.name = "World"
 	add_child(world)
 	var start := OS.get_environment("BOO_START_ROOM")
-	world.start(start if start != "" else GameState.room_id)
+	if start == "" and OS.get_environment("BOO_CAPTURE") == "" and Save.load_game(0) == OK:
+		# Continue: wake at the last Hearth.
+		var spawn: Array = world.respawn_point()
+		world.start(spawn[0])
+		world.place_player(spawn[0], spawn[1])
+	else:
+		world.start(start if start != "" else GameState.room_id)
 	if capture:
 		capture.attach.call_deferred(world.player)
 	if OS.get_environment("BOO_DIALOGUE") != "":
