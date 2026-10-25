@@ -1,0 +1,33 @@
+{
+  "_help": [
+    "A bat is a body and two wings. 'fly' flaps them; 'hang' folds them (the game flips it upside down)."
+  ],
+  "sprite": "bat",
+  "palette": "bat",
+  "frame": [24, 18],
+  "hip": [11, 9],
+  "parts": {
+    "body": {"grid": "body", "pivot": [2, 2], "parent": "hip"},
+    "wing_r": {"grid": "wing_r", "pivot": [0, 1], "parent": "body", "attach": [4, 2]},
+    "wing_l": {"grid": "wing_l", "pivot": [7, 1], "parent": "body", "attach": [0, 2], "shade": 0.8}
+  },
+  "draw_order": ["wing_l", "body", "wing_r"],
+  "anims": {
+    "fly": {
+      "frames": 4,
+      "fps": 12,
+      "hip_dy": {"mean": 0, "amp": 1},
+      "body": {"mean": 0},
+      "wing_r": {"mean": -10, "amp": 40},
+      "wing_l": {"mean": 10, "amp": -40}
+    },
+    "hang": {
+      "frames": 2,
+      "fps": 2,
+      "hip_dy": {"mean": 0},
+      "body": {"mean": 0},
+      "wing_r": {"mean": 70},
+      "wing_l": {"mean": -70}
+    }
+  }
+}

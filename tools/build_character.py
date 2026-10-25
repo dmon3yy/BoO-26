@@ -1,6 +1,7 @@
 """Bake rigged characters into sprite sheets + normal-map sheets + metadata.
 
 Rig format: content/rigs/<name>.json (parts, hierarchy, animation cycles).
+Every rig in content/rigs is baked unless names are given on the command line.
 Pixels:     content/sprites/<sprite>.pxl
 Output:     game/art/characters/<name>.png, <name>_n.png, <name>.json
 
@@ -94,6 +95,10 @@ def bake(name: str) -> None:
             height = np.zeros((fh, fw), np.float32)
             for z, pname in enumerate(rig["draw_order"]):
                 part = rig["parts"][pname]
+                # A part can appear only in some animations ("only") or be
+                # hidden in some ("not_in"): the club only shows mid-swing.
+                if ("only" in part and aname not in part["only"]) or aname in part.get("not_in", []):
+                    continue
                 rgba, h = part_img[pname]
                 x, y, ang = pose[pname]
                 piv = (part["pivot"][0] + 0.5, part["pivot"][1] + 0.5)
@@ -108,7 +113,7 @@ def bake(name: str) -> None:
             frames_rgba.append(color)
             frames_n.append(n)
         meta["anims"][aname] = {"start": start, "count": anim["frames"], "fps": anim["fps"],
-                                "loop": aname not in ("jump", "fall")}
+                                "loop": anim.get("loop", aname not in ("jump", "fall"))}
 
     sheet = np.concatenate(frames_rgba, axis=1)
     nsheet = np.concatenate(frames_n, axis=1)
@@ -121,5 +126,5 @@ def bake(name: str) -> None:
 
 
 if __name__ == "__main__":
-    for n in (sys.argv[1:] or ["orpheus"]):
+    for n in (sys.argv[1:] or sorted(p.stem for p in (CONTENT / "rigs").glob("*.json"))):
         bake(n)

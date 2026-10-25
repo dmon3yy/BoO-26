@@ -1,0 +1,31 @@
+{
+  "frame_size": [
+    32,
+    26
+  ],
+  "origin": [
+    12,
+    23
+  ],
+  "anims": {
+    "idle": {
+      "start": 0,
+      "count": 8,
+      "fps": 6,
+      "loop": true
+    },
+    "spit": {
+      "start": 8,
+      "count": 4,
+      "fps": 10,
+      "loop": false
+    },
+    "stagger": {
+      "start": 12,
+      "count": 2,
+      "fps": 6,
+      "loop": true
+    }
+  },
+  "frames": 14
+}

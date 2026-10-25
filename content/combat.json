@@ -1,0 +1,38 @@
+{
+  "_help": "Orpheus's fighting kit, in pixels, seconds and hit points. An attack has three phases: startup (wind-up, can't hit yet), active (the club can hit) and recovery (can't act yet). 'on_beat' is what an input graded GOOD or PERFECT by the music clock earns: more damage, a perfect parry, and Muse. Nothing in combat requires the beat; it just rewards it. Change a number here and run the tests.",
+  "club": {
+    "damage": 2,
+    "startup": 0.06,
+    "active": 0.10,
+    "recovery": 0.14,
+    "reach": [24, 20],
+    "offset": [16, -16],
+    "knockback": 150,
+    "hitstop": 0.05
+  },
+  "dodge": {
+    "speed": 250,
+    "time": 0.2,
+    "invulnerable": 0.2,
+    "cooldown": 0.3
+  },
+  "parry": {
+    "window": 0.2,
+    "cooldown": 0.35,
+    "stagger": 1.2,
+    "block_knockback": 70
+  },
+  "hurt": {
+    "stun": 0.3,
+    "invulnerable": 1.0,
+    "knockback": [150, -140],
+    "hitstop": 0.07
+  },
+  "on_beat": {
+    "damage_multiplier": 1.5,
+    "hitstop": 0.09,
+    "muse_hit": 8,
+    "muse_parry": 15
+  },
+  "muse_max": 100
+}

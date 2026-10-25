@@ -1,0 +1,40 @@
+{
+  "_help": ["A snake is a coil, a neck and a head. 'spit' rears back and lunges; the game fires on the lunge."],
+  "sprite": "snake",
+  "palette": "snake",
+  "frame": [32, 26],
+  "hip": [12, 22],
+  "parts": {
+    "coil": {"grid": "coil", "pivot": [7, 4], "parent": "hip"},
+    "neck": {"grid": "neck", "pivot": [2, 9], "parent": "coil", "attach": [10, 1]},
+    "head": {"grid": "head", "pivot": [1, 3], "parent": "neck", "attach": [2, 0]}
+  },
+  "draw_order": ["coil", "neck", "head"],
+  "anims": {
+    "idle": {
+      "frames": 8,
+      "fps": 6,
+      "hip_dy": {"mean": 0},
+      "coil": {"mean": 0},
+      "neck": {"mean": -8, "amp": 8},
+      "head": {"mean": 8, "amp": 6, "phase": 0.15}
+    },
+    "spit": {
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "hip_dy": {"mean": 0},
+      "coil": {"mean": 0},
+      "neck": {"mean": 0, "amp": -24, "harmonic": 0.5, "phase": 0.25},
+      "head": {"mean": 10, "amp": -12, "harmonic": 0.5, "phase": 0.25}
+    },
+    "stagger": {
+      "frames": 2,
+      "fps": 6,
+      "hip_dy": {"mean": 0},
+      "coil": {"mean": 0},
+      "neck": {"mean": 20, "amp": 4},
+      "head": {"mean": 30, "amp": 6}
+    }
+  }
+}

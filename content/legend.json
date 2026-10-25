@@ -23,6 +23,9 @@
     "c": "broken_column",
     "Y": "olive_tree",
     "F": "furnace",
-    "S": "song_seal"
+    "S": "song_seal",
+    "s": "satyr",
+    "v": "bat",
+    "n": "snake"
   }
 }

@@ -5,12 +5,15 @@ extends Control
 ##   ITEM     auto-calibrate: tap 16 beats, the average error becomes your input offset
 ##   ←/→      nudge input offset (5 ms)      ↑/↓  nudge visual offset (5 ms)
 ##   ATTACK   toggle rhythm assist           LYRE  switch song
-##   PAUSE    save settings and return to the game
+##   PAUSE    save settings and return to the game (or to the pause menu)
 ##
 ## The numbers on screen (output latency, threads, isolation) are what the web
 ## audio decision in docs/learn/M0.md is based on.
 
 const SONGS := ["metronome", "erebos", "arcadia"]
+
+## Opened from the pause menu: PAUSE closes the lab instead of reloading the game.
+var overlay := false
 
 var _song := 0
 var _deltas: Array[float] = []
@@ -83,7 +86,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		Settings.visual_offset -= 0.005
 	elif event.is_action_pressed(&"pause"):
 		Settings.save_settings()
-		get_tree().change_scene_to_file("res://game/main.tscn")
+		get_viewport().set_input_as_handled()
+		if overlay:
+			queue_free()
+		else:
+			get_tree().change_scene_to_file("res://game/main.tscn")
 
 
 func _tap() -> void:
