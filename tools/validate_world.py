@@ -216,6 +216,25 @@ def check_edges(w: World, rep: Report) -> None:
                     rep.errors.append(f"{rid}: {side} edge opening at {inside} runs into a wall in {other}")
 
 
+def check_footing(w: World, rep: Report) -> None:
+    """Things that stand on the ground (braziers, Hearths, trees, people,
+    walking enemies) must have floor or a ledge right under them. Hanging
+    lanterns, icicles, bobbing pickups and flyers are exempt."""
+    flyers = {k for k, v in w.enemies.items() if isinstance(v, dict) and v.get("flies")} | {"bat"}
+    for e in w.entities:
+        kind = e["kind"]
+        spec = w.props.get(kind, {}) if isinstance(w.props.get(kind), dict) else {}
+        if kind == "player_start" or kind in flyers or kind == "pickup":
+            continue
+        if kind in w.props and (spec.get("hang") or spec.get("drip") or spec.get("bob")):
+            continue
+        if kind not in w.props and kind not in w.npcs and kind not in w.enemies:
+            continue
+        below = w.char((e["x"], e["y"] + 1))
+        if below not in SOLID and below != "=":
+            rep.errors.append(f"{e['id']}: floating, with nothing under it ({below!r})")
+
+
 def solve(w: World, rep: Report) -> None:
     starts = [(e["x"], e["y"]) for e in w.entities if e["kind"] == "player_start"]
     # Orpheus starts with whatever content/new_game.json gives him.
@@ -311,6 +330,7 @@ def validate(base: Path = CONTENT) -> Report:
     if rep.errors:
         return rep
     check_edges(w, rep)
+    check_footing(w, rep)
     solve(w, rep)
     return rep
 

@@ -181,3 +181,24 @@ def test_unknown_character(tmp_path, bad):
     g[5][5] = bad
     rep = validate(make_world(tmp_path, {"r": ((0, 0), g, [])}))
     assert any("unknown character" in e for e in rep.errors)
+
+
+def test_floating_brazier_is_an_error(tmp_path):
+    g = blank()
+    g[13][3] = "P"
+    g[10][8] = "T"              # three rows above the floor
+    make_world(tmp_path, {"r": ((0, 0), g, [])})
+    shutil.copy(CONTENT / "props.json", tmp_path / "props.json")
+    rep = validate(tmp_path)
+    assert any("torch_8_10: floating" in e for e in rep.errors), rep.errors
+
+
+def test_brazier_on_a_ledge_is_fine(tmp_path):
+    g = blank()
+    g[13][3] = "P"
+    g[11][7] = g[11][8] = g[11][9] = "="
+    g[10][8] = "T"
+    make_world(tmp_path, {"r": ((0, 0), g, [])})
+    shutil.copy(CONTENT / "props.json", tmp_path / "props.json")
+    rep = validate(tmp_path)
+    assert not any("floating" in e for e in rep.errors), rep.errors
