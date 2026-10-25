@@ -100,15 +100,22 @@ func _act(delta: float) -> void:
 			if mode == "asleep":
 				play("idle")
 		"pace":
-			velocity.x = facing * float(spec["walk_speed"])
-			play("walk")
+			# Plod towards him, but don't grind against a wall or stand on his toes.
+			var p := player()
+			var close := p != null and absf(p.global_position.x - global_position.x) < size.x * 0.4
+			if is_on_wall() and get_wall_normal().x * facing < 0.0 or close:
+				velocity.x = 0.0
+				play("idle")
+			else:
+				velocity.x = facing * float(spec["walk_speed"])
+				play("walk")
 		"charge":
 			_charge_t += delta
 			var speed := float(spec["charge_speed"]) * (1.2 if angry() else 1.0)
 			velocity.x = facing * speed
 			if _steam <= 0.0:
 				_steam = 0.06
-				_puff(Vector2(-facing * 18, -26))
+				_puff(Vector2(-facing * size.x * 0.4, -size.y * 0.85))
 			if is_on_wall():
 				_hit_wall()
 			elif _charge_t > float(spec["charge_max"]):
@@ -118,13 +125,13 @@ func _act(delta: float) -> void:
 func _hit_wall() -> void:
 	mode = "dazed"
 	_beats_left = int(spec["stun_beats"])
-	velocity.x = -facing * 60.0
+	velocity.x = -facing * 90.0     # it rebounds off the wall rather than sinking into it
 	play("dazed")
 	Sfx.hit("bull_crash")
 	Hitstop.freeze(get_tree(), 0.08)
 	Events.shake.emit(0.25)
 	for i in 3:
-		Burst.spawn(get_parent(), global_position + Vector2(facing * 22, -12 - i * 6), Color(1.0, 0.8, 0.4), 10.0 + i * 4)
+		Burst.spawn(get_parent(), global_position + Vector2(facing * size.x * 0.5, -size.y * 0.4 - i * 8), Color(1.0, 0.8, 0.4), 10.0 + i * 4)
 
 
 # --- fire -------------------------------------------------------------------------------
@@ -138,7 +145,7 @@ func _breathe_fire() -> void:
 	_flame.length = float(spec["flame_range"])
 	_flame.owner_bull = self
 	get_parent().add_child(_flame)
-	_flame.global_position = global_position + Vector2(facing * 20, -6)
+	_flame.global_position = global_position + Vector2(facing * size.x * 0.5, -6)
 
 
 func _end_flame() -> void:
@@ -156,7 +163,7 @@ func take_hit(damage: int, dir: int, _knockback: float, _on_beat: bool) -> void:
 	var from_behind := dir == facing
 	if mode != "dazed" and not from_behind:
 		Sfx.hit("parry", -2.0, 0.7)
-		Burst.spawn(get_parent(), hurtbox().get_center() + Vector2(facing * 14, 0), Color(1.0, 0.85, 0.5), 8.0)
+		Burst.spawn(get_parent(), hurtbox().get_center() + Vector2(facing * size.x * 0.4, 0), Color(1.0, 0.85, 0.5), 8.0)
 		return
 	hp -= damage
 	_flash = 0.12
@@ -194,7 +201,7 @@ func _defeat() -> void:
 	Events.enemy_defeated.emit(kind, hurtbox().get_center(), int(spec.get("olives", 0)))
 	Sfx.hit("bull_crash", 0.0, 0.7)
 	for i in 6:
-		Burst.spawn(get_parent(), hurtbox().get_center() + Vector2(randf_range(-20, 20), randf_range(-14, 8)),
+		Burst.spawn(get_parent(), hurtbox().get_center() + Vector2(randf_range(-40, 40), randf_range(-20, 12)),
 			Color(1.0, 0.7, 0.35), 12.0 + i * 3, 0.5 + i * 0.08)
 	var tw := create_tween()
 	tw.tween_interval(0.4)

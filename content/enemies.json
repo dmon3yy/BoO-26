@@ -83,14 +83,16 @@
     "charge_speed": 250,
     "charge_max": 1.8,
     "stun_beats": 4,
-    "flame_range": 96,
+    "flame_range": 128,
     "flame_damage": 2,
     "flame_from_hp": 12,
     "size": [
-      40,
-      30
+      96,
+      44
     ],
     "olives": 15,
-    "_note": "A bronze machine from Hephaestus's forge, or a copy of one. Its armoured front shrugs off the club: dodge its charge, strike its back, or hit it while it's dazed against a wall."
+    "_note": "A bronze machine from Hephaestus's forge, or a copy of one. Its armoured front shrugs off the club: dodge its charge, strike its back, or hit it while it's dazed against a wall.",
+    "scale": 2,
+    "art_shift": 3
   }
 }

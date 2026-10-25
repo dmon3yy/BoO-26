@@ -82,6 +82,7 @@ func _ready() -> void:
 	sprite.texture = ContentDB.lit_texture(base)
 	sprite.hframes = int(meta["frames"])
 	sprite.centered = false
+	sprite.scale = Vector2.ONE * float(spec.get("scale", 1.0))
 	add_child(sprite)
 	play(_anims.keys()[0])
 
@@ -218,6 +219,9 @@ func _animate(delta: float) -> void:
 	sprite.offset = -_origin
 	if facing < 0:
 		sprite.offset.x = -(_frame_w - _origin.x - 1)
+	# `art_shift` nudges the drawing backwards so its body sits centred on the
+	# collision box (the head would otherwise poke into walls).
+	sprite.position.x = -facing * float(spec.get("art_shift", 0.0)) * sprite.scale.x
 	# Hit flash, then a soft pink while charmed.
 	if _flash > 0.0:
 		sprite.modulate = Color(1.0, 0.45, 0.4)

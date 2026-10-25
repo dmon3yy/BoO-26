@@ -204,3 +204,26 @@ func test_the_bulls_front_is_armour() -> void:
 	b.mode = "dazed"
 	b.take_hit(3, 1, 0.0, false)         # dazed: anywhere
 	assert_eq(b.hp, b.max_hp - 6)
+
+
+func test_the_bull_rams_a_wall_and_stays_out_of_it() -> void:
+	var o := await _arena()
+	var wall := StaticBody2D.new()
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(32, 200)
+	shape.shape = rect
+	wall.position = Vector2(-200, -100)
+	wall.add_child(shape)
+	o.get_parent().add_child(wall)
+	o.global_position = Vector2(300, 0)
+	var b := Enemy.create("colchis_bull") as Bull
+	o.get_parent().add_child(b)
+	b.global_position = Vector2(0, 0)
+	await wait_physics_frames(2)
+	b.facing = -1
+	b.mode = "charge"
+	await wait_physics_frames(60)
+	assert_eq(b.mode, "dazed", "the wall stops it cold")
+	await wait_physics_frames(20)
+	assert_gt(b.hurtbox().position.x, -184.0, "and it isn't sunk into the wall")
