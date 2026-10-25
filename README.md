@@ -4,7 +4,7 @@
 
 Orpheus crosses a frozen Greece earning the gods' help, one verse of his song at a time, then follows Eurydice down to Erebos, the company town behind the Wall. It's a fully seamless pixel-art Metroidvania with dynamic lighting, rhythm-infused combat, a Souls-lite bite and an ending you earn.
 
-**Status:** Milestone 0 (foundations and spikes): art direction, lighting, rooms, music, rhythm clock, saves, dialogue, tests and CI. See [docs/learn/M0.md](docs/learn/M0.md).
+**Status:** Milestone 3, the vertical slice: Arcadia from a cold start to the road east, with Zeus, Eurydice, Hermes narrating, a journal, olives and echoes, the crouch strike and the Colchis Bull. How each milestone works: [M0](docs/learn/M0.md), [M1](docs/learn/M1.md), [M2](docs/learn/M2.md), [M3](docs/learn/M3.md).
 
 ## Play
 - **Web:** the GitHub Pages build from CI (the threaded build; `lite/` is single-threaded). Add `?lab` to open the Beat Lab.
