@@ -1,6 +1,6 @@
 extends GutTest
 ## M3, the vertical slice: what a new game holds, the crouch strike, the
-## Colchis Bull's armour, pickups, gates, the echo and its olives, the journal.
+## Colchis Bull's armour, pickups, gates, dropped olives, enemies coming back, the journal.
 
 const WorldManager := preload("res://game/world/world_manager.gd")
 
@@ -85,7 +85,7 @@ func test_a_beaten_guardian_stays_beaten() -> void:
 	assert_null(get_tree().get_first_node_in_group(&"boss"))
 
 
-func test_death_leaves_half_the_olives_with_an_echo() -> void:
+func test_death_leaves_half_the_olives_to_pick_up_again() -> void:
 	await _world("arcadia_01")
 	GameState.olives = 10
 	world.player.global_position = _origin("arcadia_01") + Vector2(150, 224)
@@ -93,16 +93,35 @@ func test_death_leaves_half_the_olives_with_an_echo() -> void:
 	await world.die()
 	assert_eq(GameState.olives, 5, "half kept")
 	assert_eq(GameState.dropped_olives["amount"], 5, "half left behind")
-	var echo := get_tree().get_first_node_in_group(&"echoes")
-	assert_not_null(echo, "an echo guards them")
 	assert_eq(GameState.deaths, 1)
-	# Beat the echo, then walk onto the pile.
-	echo.take_hit(99, 1, 0.0, false)
-	await wait_physics_frames(2)
 	world.player.global_position = Vector2(GameState.dropped_olives["x"], GameState.dropped_olives["y"])
 	await wait_physics_frames(3)
-	assert_eq(GameState.olives, 10, "all back")
+	assert_eq(GameState.olives, 10, "all back, no fight needed")
 	assert_true(GameState.dropped_olives.is_empty())
+
+
+func _enemies_in(room_id: String) -> Array:
+	return world.rooms[room_id].get_children().filter(func(n): return n is Enemy and not n.is_queued_for_deletion())
+
+
+func test_beaten_enemies_stay_down_until_you_rest_or_die() -> void:
+	await _world("arcadia_02")
+	var before := _enemies_in("arcadia_02").size()
+	assert_gt(before, 0)
+	var e: Enemy = _enemies_in("arcadia_02")[0]
+	e.take_hit(99, 1, 0.0, false)
+	await wait_physics_frames(2)
+	# Walk far enough away that the room is unloaded, then come back.
+	world.place_player("arcadia_06", _origin("arcadia_06") + Vector2(200, 128))
+	await wait_physics_frames(2)
+	assert_false(world.rooms.has("arcadia_02"), "the temple was unloaded")
+	world.place_player("arcadia_02", _origin("arcadia_02") + Vector2(100, 208))
+	await wait_physics_frames(2)
+	assert_eq(_enemies_in("arcadia_02").size(), before - 1, "still beaten after wandering off")
+	await world.die()
+	world.place_player("arcadia_02", _origin("arcadia_02") + Vector2(100, 208))
+	await wait_physics_frames(2)
+	assert_eq(_enemies_in("arcadia_02").size(), before, "back after a death")
 
 
 func test_zeus_restrings_the_lyre() -> void:

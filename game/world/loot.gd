@@ -61,10 +61,8 @@ class LooseOlive:
 
 class OlivePile:
 	extends Node2D
-	## Half of Orpheus's olives, where he fell. His echo guards them; once it's
-	## gone, touch the pile to take them back.
+	## Half of Orpheus's olives, where he fell. Touch the pile to take them back.
 	var amount := 0
-	var echo: Node = null
 
 	func _ready() -> void:
 		z_index = 2
@@ -75,6 +73,3 @@ class OlivePile:
 		add_child(FxNodes.light(Vector2(0, -8), {"color": [0.6, 0.75, 1.0], "energy": 1.0, "scale": 1.2,
 			"flicker": 0.08, "shadow": false}))
 		add_child(FxNodes.halo(Vector2(0, -6), Color(0.6, 0.75, 1.0, 0.45), 18.0))
-
-	func guarded() -> bool:
-		return is_instance_valid(echo)

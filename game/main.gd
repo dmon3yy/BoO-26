@@ -7,7 +7,7 @@ extends Node2D
 ##   BOO_STATE       "full" gives Orpheus his whole early kit (for captures and testing)
 ##   BOO_TITLE       show the title screen even while capturing
 ##   BOO_OLIVES      start with this many olives
-##   BOO_DROP        "x,y": olives (half of BOO_OLIVES) already lie there, guarded by an echo
+##   BOO_DROP        "x,y": olives (half of BOO_OLIVES) already lie there
 
 const WorldManager := preload("res://game/world/world_manager.gd")
 const Capture := preload("res://game/spikes/capture.gd")

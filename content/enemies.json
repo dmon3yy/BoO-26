@@ -6,19 +6,20 @@
     "hp": 6,
     "contact_damage": 2,
     "walk_speed": 34,
-    "charge_speed": 190,
+    "charge_speed": 165,
     "sight": [
       150,
       40
     ],
     "windup_beats": 1,
-    "charge_time": 0.55,
+    "charge_time": 0.7,
     "rest_beats": 2,
     "size": [
       14,
       28
     ],
-    "olives": 3
+    "olives": 3,
+    "charge_accel": 520
   },
   "bat": {
     "char": "v",
@@ -66,26 +67,6 @@
     ],
     "olives": 2,
     "_note": "Low to the ground: a standing swing passes over it. Crouch (hold Down) and strike."
-  },
-  "echo": {
-    "rig": "orpheus",
-    "hp": 6,
-    "contact_damage": 1,
-    "walk_speed": 40,
-    "sight": 120,
-    "leash": 72,
-    "swing_reach": [
-      26,
-      22
-    ],
-    "swing_damage": 2,
-    "size": [
-      10,
-      30
-    ],
-    "olives": 0,
-    "tint": [0.3, 0.5, 0.9, 0.85],
-    "_note": "What's left of Orpheus where he last fell. It guards the olives he dropped."
   },
   "colchis_bull": {
     "char": "B",

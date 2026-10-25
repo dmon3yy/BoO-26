@@ -1,7 +1,10 @@
 class_name Satyr
 extends Enemy
 ## Paces its patch of woods. When it sees Orpheus it rears up on a beat and
-## charges on the next one, so dodge (or parry) on that next beat.
+## charges on the next one, so dodge (or parry) on that next beat. It won't
+## walk onto spikes; mid-charge it leaps them.
+
+const LEAP := -245.0             # take-off speed for leaping spikes mid-charge
 
 var mode := "patrol"            # patrol | windup | charge | rest
 var _beats_left := 0
@@ -31,7 +34,7 @@ func _on_beat(_index: int) -> void:
 func _act(delta: float) -> void:
 	match mode:
 		"patrol":
-			if is_on_wall() or not _floor_ahead() or absf(global_position.x - home.x) > 48.0 \
+			if is_on_wall() or not _floor_ahead() or _spikes_ahead(6.0) or absf(global_position.x - home.x) > 48.0 \
 					and signf(global_position.x - home.x) == float(facing):
 				facing = -facing
 			velocity.x = facing * float(spec["walk_speed"])
@@ -40,9 +43,13 @@ func _act(delta: float) -> void:
 			velocity.x = 0.0
 		"charge":
 			_charge_t += delta
-			velocity.x = facing * float(spec["charge_speed"])
-			if _charge_t >= float(spec["charge_time"]) or is_on_wall() or not _floor_ahead():
-				_end_charge()
+			# It gathers speed rather than bursting to full, so the charge reads.
+			velocity.x = move_toward(velocity.x, facing * float(spec["charge_speed"]),
+				float(spec["charge_accel"]) * delta)
+			if is_on_floor() and _spikes_ahead(8.0):
+				velocity.y = LEAP
+			elif is_on_floor() and (_charge_t >= float(spec["charge_time"]) or is_on_wall() or not _floor_ahead()):
+				_end_charge()     # never mid-leap, or it would drop onto the spikes
 		"rest":
 			velocity.x = 0.0
 			play("idle")
@@ -67,6 +74,15 @@ func _sees_player() -> bool:
 		return false
 	var d := p.global_position - global_position
 	return absf(d.x) < float(spec["sight"][0]) and absf(d.y) < float(spec["sight"][1])
+
+
+## Spikes within `reach` pixels of its leading foot?
+func _spikes_ahead(reach: float) -> bool:
+	var room := get_parent() as Room
+	if room == null:
+		return false
+	var foot := global_position - room.position + Vector2(facing * (size.x * 0.5 + reach), -4.0)
+	return room.data.char_at(floori(foot.x / 16.0), floori(foot.y / 16.0)) == "^"
 
 
 ## Is there floor one step ahead? Satyrs don't walk (or charge) off ledges.

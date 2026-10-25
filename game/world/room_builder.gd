@@ -17,14 +17,17 @@ uniform vec4 mid : source_color;
 uniform vec4 crest : source_color;
 uniform vec2 size_px;
 uniform float speed = 1.0;
+uniform bool surface = true;     // only the top row of a pool has a crest
+uniform float depth = 0.0;       // rows below the surface; deeper is darker
 void fragment() {
 	vec2 p = floor(UV * size_px);
 	float t = TIME * speed;
 	float wave = sin(p.x * 0.35 + t * 2.0) + sin(p.x * 0.13 - t * 1.3) * 0.8;
 	float n = sin(p.x * 0.9 + p.y * 1.7 + t * 3.0) * 0.5 + 0.5;
-	vec4 c = deep;
-	if (p.y < 2.0 + wave * 0.6) { c = crest; }
-	else if (n > 0.72 - p.y * 0.02) { c = mid; }
+	float dark = clamp(1.0 - (depth + UV.y) * 0.28, 0.12, 1.0);
+	vec4 c = vec4(deep.rgb * dark, deep.a);
+	if (surface && p.y < 2.0 + wave * 0.6) { c = crest; }
+	else if (n > 0.72 - p.y * 0.02 + depth * 0.12) { c = vec4(mid.rgb * dark, mid.a); }
 	COLOR = c;
 }
 """
@@ -244,15 +247,23 @@ static func _build_fluids(room: Room, data: RoomData) -> void:
 			var start := x
 			while x < data.width and data.char_at(x, y) == "~":
 				x += 1
+			# Rows under the surface carry on the same pool: no crest, and darker
+			# the deeper they go, so a pit of water reads as bottomless.
+			var depth := 0
+			while y - depth - 1 >= 0 and data.char_at(start, y - depth - 1) == "~":
+				depth += 1
 			var r := ColorRect.new()
-			r.position = Vector2(start * T, y * T + 4)
-			r.size = Vector2((x - start) * T, T - 4)
+			var top := 4 if depth == 0 else 0
+			r.position = Vector2(start * T, y * T + top)
+			r.size = Vector2((x - start) * T, T - top)
 			var mat := ShaderMaterial.new()
 			if _fluid_shader == null:
 				_fluid_shader = Shader.new()
 				_fluid_shader.code = FLUID_SHADER
 			mat.shader = _fluid_shader
 			mat.set_shader_parameter("size_px", r.size)
+			mat.set_shader_parameter("surface", depth == 0)
+			mat.set_shader_parameter("depth", float(depth))
 			if kind == "molten":
 				mat.set_shader_parameter("deep", Color("e2461a"))
 				mat.set_shader_parameter("mid", Color("ff8a2a"))
@@ -298,7 +309,11 @@ static func _build_entities(room: Room, data: RoomData) -> void:
 					var flag: String = enemies[kind].get("defeat_flag", "")
 					if flag != "" and GameState.has(flag):
 						continue     # a guardian stays beaten
+					var spawn_id := "%s:%s_%d_%d" % [data.id, kind, x, y]
+					if GameState.slain.has(spawn_id):
+						continue     # beaten since the last rest
 					var e := Enemy.create(kind)
+					e.spawn_id = spawn_id
 					e.position = foot
 					room.add_child(e)
 				_ when npcs.has(kind):

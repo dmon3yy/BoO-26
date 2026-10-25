@@ -20,6 +20,10 @@ var play_time := 0.0
 ## Hermes's asides already spoken (kept in the save file, not in the Word).
 var told: Dictionary = {}
 var deaths := 0
+## Enemies beaten since the last rest or death. They stay down until then,
+## however far you wander; resting or dying brings them all back (guardians
+## with a defeat_flag never come back). Not saved: loading counts as a rest.
+var slain: Dictionary = {}
 
 
 func _init() -> void:
@@ -44,6 +48,7 @@ func reset() -> void:
 	play_time = 0.0
 	told.clear()
 	deaths = 0
+	slain.clear()
 
 
 func _process(delta: float) -> void:

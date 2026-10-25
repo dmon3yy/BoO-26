@@ -205,6 +205,10 @@ def check_edges(w: World, rep: Report) -> None:
             for inside, outside in pairs:
                 if w.char(inside) in SOLID:
                     continue
+                # A deadly pool may run off the bottom of the screen, so it reads as
+                # deep; nobody comes out of it alive, so it needn't meet an opening.
+                if side == "bottom" and w.char(inside) == "~":
+                    continue
                 if outside not in w.grid:
                     rep.errors.append(f"{rid}: {side} edge opens onto nothing at world cell {inside}")
                 elif w.char(outside) in SOLID:
@@ -281,6 +285,22 @@ def solve(w: World, rep: Report) -> None:
         rooms = sorted({w.grid[s][1] for s in trapped})
         rep.errors.append(f"softlock: {len(trapped)} reachable spots cannot get back to a Hearth "
                           f"(rooms: {', '.join(rooms)}; first at world cell {trapped[0]})")
+    # One-way trips: the route doubles back, so every Hearth (where a death
+    # sends you) must lead back to where the game starts. Otherwise a song
+    # learned far away could never reach the seal it opens.
+    home = {s for s in stands if s in set(starts)}
+    can_return = set(home)
+    q = deque(home)
+    while q:
+        t = q.popleft()
+        for s in reverse.get(t, []):
+            if s not in can_return:
+                can_return.add(s)
+                q.append(s)
+    hearths = {(e["x"], e["y"]): e["id"] for e in w.entities if e["kind"] == "hearth"}
+    for xy, hid in sorted(hearths.items()):
+        if xy in stands and xy not in can_return:
+            rep.errors.append(f"{hid}: no way back to the start from this Hearth")
     rep.info.append(f"reachable stands: {len(stands)} across {len(visited_rooms)} rooms")
 
 

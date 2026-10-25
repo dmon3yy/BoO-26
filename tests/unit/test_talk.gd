@@ -26,12 +26,12 @@ func _key(code: Key) -> void:
 		await wait_process_frames(2)
 
 
-func _talk_through(confirm: Key, frames_between: int) -> void:
+func _talk_through(confirm: Key, frames_between: int, room_id := "arcadia_01") -> void:
 	world = WorldManager.new()
 	add_child_autofree(world)
-	world.start("arcadia_01")
+	world.start(room_id)
 	await wait_physics_frames(3)
-	var room: Room = world.rooms["arcadia_01"]
+	var room: Room = world.rooms[room_id]
 	world.talk_to(room.npcs[0])
 	await wait_process_frames(3)
 	var box: DialogueBox = null
@@ -49,8 +49,9 @@ func _talk_through(confirm: Key, frames_between: int) -> void:
 			await _key(KEY_DOWN)
 			assert_eq(box._choice, 1, "Down moves to the second reply")
 		await _key(confirm)
-	assert_true(saw_replies, "Eurydice offers replies")
-	assert_true(GameState.get_flag(&"met_eurydice"), "the conversation reached its end")
+	if room_id == "arcadia_01":
+		assert_true(saw_replies, "Eurydice offers replies")
+		assert_true(GameState.get_flag(&"met_eurydice"), "the conversation reached its end")
 	await wait_physics_frames(2)
 	assert_false(get_tree().paused, "and the world runs again")
 
@@ -65,3 +66,9 @@ func test_jump_works_too_even_when_pressed_impatiently() -> void:
 
 func test_space_works_too() -> void:
 	await _talk_through(KEY_SPACE, 4)
+
+
+func test_enter_works_with_zeus() -> void:
+	await _talk_through(KEY_ENTER, 4, "arcadia_06")
+	assert_true(GameState.has_ability(&"lyre"), "he restrung the lyre")
+	assert_true(GameState.get_flag(&"met_zeus"))

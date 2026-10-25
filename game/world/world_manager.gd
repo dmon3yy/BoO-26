@@ -10,7 +10,7 @@ extends Node2D
 ## resting at Hearths, dying on hazards and respawning, and the auto-map.
 ## Since M2 it also opens song seals, layers the music around fights, and
 ## runs the HUD and pause menu. Since M3: pickups and olives, gates, people
-## to talk to, the olive pile your echo guards, and Hermes's narration.
+## to talk to, the olives you dropped, and Hermes's narration.
 
 const VIEW := Vector2(480, 270)
 const SCROLL_TIME := 0.38
@@ -387,6 +387,7 @@ func die() -> void:
 		await get_tree().process_frame
 	await _fade_to(1.0)
 	var spawn := respawn_point()
+	_respawn_enemies()
 	place_player(spawn[0], spawn[1])
 	player.kit.restore()
 	_place_dropped_olives()
@@ -412,6 +413,18 @@ func respawn_point() -> Array:
 		if x >= 0:
 			return [start, room_origin[start] + _foot(x, y)]
 	return [start, room_origin[start] + data.size_px() * 0.5]
+
+
+## Bring back every enemy beaten since the last rest: forget them and rebuild
+## the rooms that are loaded (pickups, seals and gates keep their state).
+func _respawn_enemies() -> void:
+	GameState.slain.clear()
+	var here := current.data.id
+	for id in rooms.keys():
+		rooms[id].queue_free()
+	rooms.clear()
+	_pile = null
+	_enter(here)
 
 
 func _foot(x: int, y: int) -> Vector2:
@@ -535,7 +548,7 @@ func _collect_things() -> void:
 			o.queue_free()
 			GameState.add_olives(1)
 			Sfx.hit("olive", -10.0, randf_range(0.95, 1.1))
-	if is_instance_valid(_pile) and not _pile.guarded() and body.grow(4.0).has_point(_pile.global_position + Vector2(0, -4)):
+	if is_instance_valid(_pile) and body.grow(4.0).has_point(_pile.global_position + Vector2(0, -4)):
 		var got := GameState.recover_dropped_olives()
 		Burst.spawn(_pile.get_parent(), _pile.global_position + Vector2(0, -8), Color(0.6, 0.75, 1.0), 20.0, 0.5)
 		Sfx.hit("pickup", -4.0)
@@ -575,12 +588,10 @@ func _on_enemy_defeated(_kind: String, at: Vector2, olives: int) -> void:
 		Loot.scatter(room, at, olives)
 
 
-## The olives Orpheus dropped when he died, and the echo that guards them.
+## The olives Orpheus dropped when he died, waiting where he fell.
 func _place_dropped_olives() -> void:
 	var d: Dictionary = GameState.dropped_olives
 	if is_instance_valid(_pile) and (d.is_empty() or _pile.get_meta("at") != Vector2(d["x"], d["y"])):
-		if is_instance_valid(_pile.echo):
-			_pile.echo.queue_free()
 		_pile.queue_free()
 		_pile = null
 	if d.is_empty() or is_instance_valid(_pile) or not rooms.has(d["room"]):
@@ -592,12 +603,6 @@ func _place_dropped_olives() -> void:
 	_pile.set_meta("at", at)
 	room.add_child(_pile)
 	_pile.global_position = at
-	var echo := Enemy.create("echo") as Echo
-	echo.pile = _pile
-	room.add_child(echo)
-	echo.global_position = at + Vector2(-18, 0)
-	echo.home = echo.global_position
-	_pile.echo = echo
 
 
 # --- Gates --------------------------------------------------------------------
@@ -644,9 +649,13 @@ func rest_at(h: Vector2) -> void:
 	player.kit.restore(true)
 	Save.save_game(0)
 	Events.hearth_rested.emit(GameState.hearth_id)
+	# The fire flares: every enemy you've beaten since your last rest is back.
+	await _fade_to(0.7)
+	_respawn_enemies()
+	await _fade_to(0.0)
 	_show_word(Save.make_word())
 	_narrate("hearth")
-	await get_tree().create_timer(0.6).timeout
+	await get_tree().create_timer(0.3).timeout
 	player.frozen = false
 	_busy = false
 

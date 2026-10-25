@@ -24,8 +24,10 @@ var size := Vector2(12, 12)
 var home := Vector2.ZERO
 var anim := ""
 var sprite: Sprite2D
-## Multiplies the sprite colour (the echo is a pale blue ghost of Orpheus).
+## Multiplies the sprite colour (from the enemy's "tint", if it has one).
 var tint := Color.WHITE
+## Where the room placed it ("room:kind_x_y"), so a beaten enemy stays beaten until you rest.
+var spawn_id := ""
 
 var _anims: Dictionary
 var _frame_w := 32
@@ -47,7 +49,6 @@ static func create(enemy_kind: String) -> Enemy:
 		"bat": e = Bat.new()
 		"snake": e = Snake.new()
 		"scorpion": e = Scorpion.new()
-		"echo": e = Echo.new()
 		"colchis_bull": e = Bull.new()
 		_: return null
 	e.kind = enemy_kind
@@ -229,6 +230,8 @@ func _animate(delta: float) -> void:
 
 
 func _die() -> void:
+	if spawn_id != "":
+		GameState.slain[spawn_id] = true
 	Sfx.hit("enemy_die", -4.0)
 	Events.enemy_defeated.emit(kind, hurtbox().get_center(), int(spec.get("olives", 0)))
 	Burst.spawn(get_parent(), hurtbox().get_center(), Color(1.0, 0.9, 0.7), 18.0, 0.35)
