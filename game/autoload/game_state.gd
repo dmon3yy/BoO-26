@@ -17,6 +17,9 @@ var room_id := "arcadia_01"
 var hearth_id := ""
 var dropped_olives := {}              # {"room": String, "x": float, "y": float, "amount": int}
 var play_time := 0.0
+## Hermes's asides already spoken (kept in the save file, not in the Word).
+var told: Dictionary = {}
+var deaths := 0
 
 
 func _init() -> void:
@@ -39,6 +42,8 @@ func reset() -> void:
 	hearth_id = ""
 	dropped_olives = {}
 	play_time = 0.0
+	told.clear()
+	deaths = 0
 
 
 func _process(delta: float) -> void:
@@ -53,6 +58,12 @@ func grant_ability(ability: StringName) -> void:
 	if not abilities.has(ability):
 		abilities[ability] = true
 		Events.ability_gained.emit(ability)
+
+
+## True if Orpheus has this ability or this flag is raised. Gates and
+## dialogue ask this, so a gate can wait for "club" or for "beat_bull" alike.
+func has(need: String) -> bool:
+	return need == "" or abilities.has(StringName(need)) or flags.get(StringName(need), false) == true
 
 
 func revoke_ability(ability: StringName) -> void:
@@ -110,6 +121,8 @@ func to_dict() -> Dictionary:
 		"hearth_id": hearth_id,
 		"dropped_olives": dropped_olives,
 		"play_time": play_time,
+		"told": told.keys(),
+		"deaths": deaths,
 	}
 
 
@@ -132,6 +145,9 @@ func from_dict(d: Dictionary) -> void:
 	hearth_id = d.get("hearth_id", "")
 	dropped_olives = d.get("dropped_olives", {})
 	play_time = float(d.get("play_time", 0.0))
+	for k in d.get("told", []):
+		told[k] = true
+	deaths = int(d.get("deaths", 0))
 
 
 func _stringify_keys(src: Dictionary) -> Dictionary:

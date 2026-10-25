@@ -1,0 +1,12 @@
+{
+  "_help": "What a pickup is called when Orpheus finds it (keyed by the ability it gives).",
+  "club": {
+    "name": "An olive-wood club! (X to swing)"
+  },
+  "song:hymn": {
+    "name": "Calliope's Hymn: left, right, middle, up"
+  },
+  "song:charm": {
+    "name": "Song of Charming: down, left, down, right"
+  }
+}

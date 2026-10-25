@@ -1,4 +1,4 @@
 {
-  "_help": "What Orpheus starts a new game with. During M2 he starts with his whole early kit so combat and songs can be tried anywhere; M3 hands these out properly (Zeus gives the lyre, the club and the Song of Zeus). The world validator starts from these abilities too.",
-  "abilities": ["lyre", "club", "shield", "song:zeus", "song:charm", "song:hymn"]
+  "_help": "What Orpheus starts a new game with. Since M3 he starts with nothing: he finds his club, Zeus restrings his lyre and teaches him the Song of Zeus. The world validator starts from these abilities too.",
+  "abilities": []
 }

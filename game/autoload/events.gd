@@ -16,3 +16,10 @@ signal player_hp_changed(hp: int, max_hp: int)
 signal muse_changed(muse: float, max_muse: float)
 ## Every graded action (swing, parry, note), so the HUD can show the beat.
 signal beat_graded(grade: int, what: String)
+## An enemy was defeated at `at` (world position), dropping `olives`.
+signal enemy_defeated(kind: String, at: Vector2, olives: int)
+## Hermes has something to say (see content/narration.json).
+signal narrate(key: String)
+signal journal_added(entry_id: String)
+## Shake the screen for a moment (if Pause > Screen shake is on).
+signal shake(seconds: float)

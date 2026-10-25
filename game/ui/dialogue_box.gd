@@ -14,6 +14,7 @@ const CHARS_PER_SECOND := 45.0
 const BOX := Rect2(8, 192, 464, 70)
 
 var _resource: Resource
+var _states: Array = []
 var _line: DialogueLine
 var _panel: Panel
 var _speaker: Label
@@ -35,10 +36,13 @@ func _ready() -> void:
 	visible = false
 
 
-func start(resource: Resource, title: String = "start") -> void:
+## `states` are extra objects the dialogue can read and change by name,
+## e.g. [{"World": world}] lets a line say `do World.give_olives(5)`.
+func start(resource: Resource, title: String = "start", states: Array = []) -> void:
 	_resource = resource
+	_states = states
 	visible = true
-	await _show(await DialogueManager.get_next_dialogue_line(_resource, title))
+	await _show(await DialogueManager.get_next_dialogue_line(_resource, title, _states))
 
 
 func _show(line: DialogueLine) -> void:
@@ -101,12 +105,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			var next_id: String = _line.responses[_choice].next_id
 			_clear_reply_panel()
 			get_viewport().set_input_as_handled()
-			_show(await DialogueManager.get_next_dialogue_line(_resource, next_id))
+			_show(await DialogueManager.get_next_dialogue_line(_resource, next_id, _states))
 		get_viewport().set_input_as_handled()
 		return
 	if confirm:
 		get_viewport().set_input_as_handled()
-		_show(await DialogueManager.get_next_dialogue_line(_resource, _line.next_id))
+		_show(await DialogueManager.get_next_dialogue_line(_resource, _line.next_id, _states))
 
 
 func _clear_reply_panel() -> void:

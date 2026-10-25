@@ -1,5 +1,5 @@
 extends GutTest
-## M2 combat: the club, the dodge, the parry, getting hurt, enemies and songs.
+## Combat: the club, the dodge, the parry, getting hurt, enemies and songs.
 ## A tiny arena (one floor) is built for each test; inputs come from a fake pad.
 
 var arena: Node2D
@@ -29,6 +29,9 @@ class Pad:
 
 func before_each() -> void:
 	GameState.reset()
+	# Since M3 a new game starts empty-handed; these tests want the whole kit.
+	for a in [&"lyre", &"club", &"shield", &"song:zeus", &"song:charm", &"song:hymn"]:
+		GameState.grant_ability(a)
 	Music.stop()
 	arena = Node2D.new()
 	add_child_autofree(arena)

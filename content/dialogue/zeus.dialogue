@@ -1,13 +1,43 @@
 ~ start
 
-Hermes: You know how this one goes. Everybody does. Doesn't stop anybody asking.
-Hermes: A boy with a lyre. A girl who was hungry. A winter that wouldn't end.
-Zeus: You climbed all this way through the snow, little singer. What do you offer a god for his attention?
+if GameState.get_flag("met_zeus")
+	=> shop
+Zeus: So. A boy with a lyre climbs my mountain in the worst winter since the Titans.
+Zeus: What do you offer a god for his attention?
 - A song.
 	Zeus: Ha! Songs don't buy bread. Though now and then they buy a god's curiosity.
 - Nothing. I have nothing.
 	Zeus: Then you're richer than most who climb these steps. They all come owing something.
 - What would you take?
-	Zeus: Olives, usually. The others are... particular about payment. Remember that.
-Zeus: Go east, to Athens. My daughter likes clever things, and you seem almost clever.
+	Zeus: Olives, usually. My family are particular about payment. Remember that.
+Zeus: Let's hear this lyre, then.
+Orpheus: The strings froze on the way up. Two of them snapped.
+Zeus: Give it here.
+do World.restring_lyre()
+Zeus: Gold thread, from my own cloak. Don't sell it.
+Zeus: And a tune to go with it. My tune. Four notes: up, left, right, up.
+Zeus: Some doors in this country were sealed by me, and they open for my song. There's one in the old temple, back west.
+Zeus: Hold the lyre to play. It's written in your journal now. Everything worth knowing is.
+Zeus: As for the winter: Hades called his wife home months early, and her mother has taken it badly. Seasons don't keep themselves.
+Zeus: You want spring back? Go east, to Athens. My daughter likes clever things, and you seem almost clever.
+Zeus: One more thing. A bronze bull has been grazing in the pen under the brook. Hephaestus swears it isn't one of his.
+Zeus: It lets no one past. Hit it where the bronze is thin. Behind, boy. Always behind.
+do GameState.set_flag("met_zeus")
+=> END
+
+~ shop
+
+Zeus: Back again. Prayers, complaints, or business?
+- Ambrosia, for thirty olives. [if not GameState.get_flag("bought_ambrosia")]
+	if GameState.olives >= 30
+		do World.buy_ambrosia(30)
+		Zeus: Food of the gods. One more heart in you. Don't get used to it.
+	else
+		Zeus: Thirty olives. I can count, even if you can't.
+- Remind me of your song.
+	Zeus: Up, left, right, up. Hold the lyre and play it near a seal. Try not to embarrass me.
+- Which way now?
+	Zeus: East, through the bull. I did mention the bull.
+- Nothing. Goodbye.
+	Zeus: They all say goodbye. They all come back.
 => END

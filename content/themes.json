@@ -11,20 +11,53 @@
     "ledge": "marble_ledge",
     "spikes": "spikes_ice",
     "fluid": "ice_water",
-    "ambient": [0.4, 0.45, 0.66],
+    "ambient": [
+      0.4,
+      0.45,
+      0.66
+    ],
     "particles": "snow",
     "music": "arcadia",
     "backgrounds": [
-      {"tex": "arcadia_sky", "factor": 0.0, "glow": "arcadia_sky_e"},
-      {"tex": "arcadia_far", "factor": 0.1},
-      {"tex": "arcadia_mid", "factor": 0.22},
-      {"tex": "arcadia_grove", "factor": 0.45}
+      {
+        "tex": "arcadia_sky",
+        "factor": 0.0,
+        "glow": "arcadia_sky_e"
+      },
+      {
+        "tex": "arcadia_far",
+        "factor": 0.1
+      },
+      {
+        "tex": "arcadia_mid",
+        "factor": 0.22
+      },
+      {
+        "tex": "arcadia_grove",
+        "factor": 0.45
+      }
     ],
     "sky_light": {
-      "color": [0.55, 0.62, 0.9],
+      "color": [
+        0.55,
+        0.62,
+        0.9
+      ],
       "energy": 0.55
     },
-    "halos": [[372, 58, 70, [0.75, 0.8, 1.0, 0.35]]]
+    "halos": [
+      [
+        372,
+        58,
+        70,
+        [
+          0.75,
+          0.8,
+          1.0,
+          0.35
+        ]
+      ]
+    ]
   },
   "arcadia_cave": {
     "solid": {
@@ -37,17 +70,38 @@
     "ledge": "marble_ledge",
     "spikes": "spikes_ice",
     "fluid": "ice_water",
-    "ambient": [0.3, 0.32, 0.46],
+    "ambient": [
+      0.3,
+      0.32,
+      0.46
+    ],
     "particles": "",
     "music": "arcadia",
     "backgrounds": [
-      {"tex": "arcadia_sky", "factor": 0.0, "glow": "arcadia_sky_e"},
-      {"tex": "arcadia_far", "factor": 0.1},
-      {"tex": "arcadia_mid", "factor": 0.22},
-      {"tex": "arcadia_grove", "factor": 0.45}
+      {
+        "tex": "arcadia_sky",
+        "factor": 0.0,
+        "glow": "arcadia_sky_e"
+      },
+      {
+        "tex": "arcadia_far",
+        "factor": 0.1
+      },
+      {
+        "tex": "arcadia_mid",
+        "factor": 0.22
+      },
+      {
+        "tex": "arcadia_grove",
+        "factor": 0.45
+      }
     ],
     "sky_light": {
-      "color": [0.55, 0.62, 0.9],
+      "color": [
+        0.55,
+        0.62,
+        0.9
+      ],
       "energy": 0.0
     },
     "halos": []
@@ -63,18 +117,124 @@
     "ledge": "iron_grate",
     "spikes": "spikes_iron",
     "fluid": "molten",
-    "ambient": [0.34, 0.27, 0.29],
+    "ambient": [
+      0.34,
+      0.27,
+      0.29
+    ],
     "particles": "embers",
     "music": "erebos",
     "backgrounds": [
-      {"tex": "erebos_cave", "factor": 0.0},
-      {"tex": "erebos_city", "factor": 0.12, "glow": "erebos_city_e"},
-      {"tex": "erebos_mid", "factor": 0.32}
+      {
+        "tex": "erebos_cave",
+        "factor": 0.0
+      },
+      {
+        "tex": "erebos_city",
+        "factor": 0.12,
+        "glow": "erebos_city_e"
+      },
+      {
+        "tex": "erebos_mid",
+        "factor": 0.32
+      }
     ],
     "sky_light": {
-      "color": [1.0, 0.45, 0.2],
+      "color": [
+        1.0,
+        0.45,
+        0.2
+      ],
       "energy": 0.4
     },
     "glow_chance": 0.22
+  },
+  "arcadia_summit": {
+    "solid": {
+      "#": "limestone_snow",
+      "%": "marble_snow"
+    },
+    "back": {
+      "b": "limestone_back"
+    },
+    "ledge": "marble_ledge",
+    "spikes": "spikes_ice",
+    "fluid": "ice_water",
+    "ambient": [
+      0.44,
+      0.48,
+      0.7
+    ],
+    "particles": "snow",
+    "music": "arcadia",
+    "backgrounds": [
+      {
+        "tex": "arcadia_sky",
+        "factor": 0.0,
+        "glow": "arcadia_sky_e"
+      },
+      {
+        "tex": "arcadia_far",
+        "factor": 0.1
+      },
+      {
+        "tex": "arcadia_mid",
+        "factor": 0.22
+      },
+      {
+        "tex": "arcadia_grove",
+        "factor": 0.45
+      }
+    ],
+    "sky_light": {
+      "color": [
+        0.7,
+        0.78,
+        1.0
+      ],
+      "energy": 0.7
+    },
+    "halos": [
+      [
+        372,
+        58,
+        70,
+        [
+          0.75,
+          0.8,
+          1.0,
+          0.35
+        ]
+      ]
+    ]
+  },
+  "arcadia_crypt": {
+    "solid": {
+      "#": "limestone_snow",
+      "%": "marble_snow"
+    },
+    "back": {
+      "b": "limestone_back"
+    },
+    "ledge": "marble_ledge",
+    "spikes": "spikes_ice",
+    "fluid": "ice_water",
+    "ambient": [
+      0.22,
+      0.22,
+      0.32
+    ],
+    "particles": "",
+    "music": "arcadia",
+    "backgrounds": [],
+    "sky_light": {
+      "color": [
+        0.55,
+        0.62,
+        0.9
+      ],
+      "energy": 0.0
+    },
+    "halos": []
   }
 }

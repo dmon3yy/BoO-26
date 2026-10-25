@@ -1,0 +1,65 @@
+{
+  "_help": "Journal entries, in order. Each appears once its 'when' is true: 'always', 'flag:<id>', 'ability:<id>' or 'room:<id>' (visited). The Songs page is added by the game.",
+  "entries": [
+    {
+      "id": "winter",
+      "title": "The winter",
+      "when": "always",
+      "text": "Hades called Persephone home too early, and the seasons broke. Orpheus has sworn to finish a song that brings the spring back."
+    },
+    {
+      "id": "eurydice",
+      "title": "Eurydice",
+      "when": "flag:met_eurydice",
+      "text": "A drifter keeping the Hearth in the Frozen Grove. Hungry, sharp, and not impressed. She wants to hear the song when it's finished."
+    },
+    {
+      "id": "hearths",
+      "title": "Hearths and Words",
+      "when": "always",
+      "text": "Press Up at a Hearth of Hestia to rest: full health, a save, and a Word. A Word is your whole game in a few letters. Enter it on the title screen to carry on anywhere."
+    },
+    {
+      "id": "olives",
+      "title": "Olives",
+      "when": "always",
+      "text": "Olives are money, even to gods. Dying leaves half of yours where you fell, guarded by your echo. Beat it to take them back. Die again first, and they're gone."
+    },
+    {
+      "id": "fighting",
+      "title": "Fighting",
+      "when": "ability:club",
+      "text": "X swings the club, C dodges (nothing can hurt you mid-dodge). Enemies attack on the beat, so the music warns you. A swing on the beat hits half again as hard and fills your Muse."
+    },
+    {
+      "id": "zeus",
+      "title": "Zeus",
+      "when": "flag:met_zeus",
+      "text": "Restrung the lyre with gold thread and taught the Song of Zeus. Sells Ambrosia (one more heart) for 30 olives. His advice: go east to Athens, and hit the bull from behind."
+    },
+    {
+      "id": "seals",
+      "title": "Song seals",
+      "when": "ability:song:zeus",
+      "text": "Doors marked with a lyre open to the Song of Zeus. Stand close, hold the lyre (Shift), and play Up, Left, Right, Up. One is in the old temple, west of the Shepherd's Drop."
+    },
+    {
+      "id": "crouch",
+      "title": "Crouching",
+      "when": "room:arcadia_10",
+      "text": "Hold Down to crouch. Swing while crouched to strike low: the only way to reach a scorpion. Crouching also ducks under venom."
+    },
+    {
+      "id": "bull",
+      "title": "The Colchis Bull",
+      "when": "room:arcadia_08",
+      "text": "A bronze machine in the pen under the brook. Its front is armour. When it scrapes the ground it charges on the next beat: dodge through it, or get up high. Dazed against a wall, it's open everywhere."
+    },
+    {
+      "id": "road",
+      "title": "The road east",
+      "when": "flag:beat_bull",
+      "text": "With the bull beaten, the gate east of the pen is open. Athens lies beyond, and Athena with it."
+    }
+  ]
+}

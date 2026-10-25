@@ -10,11 +10,12 @@ signal closed
 ## Asked before opening (the world says no while dying, resting or on the map).
 var can_open: Callable = func(): return true
 
-const LINES := ["Resume", "Rhythm assist", "Input offset", "Calibrate the beat (Beat Lab)", "Screen shake"]
+const LINES := ["Resume", "Journal", "Rhythm assist", "Input offset", "Calibrate the beat (Beat Lab)", "Screen shake"]
 
 var _sel := 0
 var _labels: Array[Label] = []
 var _lab: Control
+var _journal: JournalView
 
 
 func _ready() -> void:
@@ -53,7 +54,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			open()
 			get_viewport().set_input_as_handled()
 		return
-	if _lab:
+	if _lab or is_instance_valid(_journal):
 		return
 	if event.is_action_pressed(&"pause"):
 		close()
@@ -77,16 +78,23 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _change(dir: int) -> void:
 	match _sel:
-		1: Settings.rhythm_assist = not Settings.rhythm_assist
-		2: Settings.input_offset += dir * 0.005
-		4: Settings.screen_shake = not Settings.screen_shake
+		2: Settings.rhythm_assist = not Settings.rhythm_assist
+		3: Settings.input_offset += dir * 0.005
+		5: Settings.screen_shake = not Settings.screen_shake
 
 
 func _choose() -> void:
 	match _sel:
 		0: close()
-		3: _open_lab()
+		1: open_journal()
+		4: _open_lab()
 		_: _change(1)
+
+
+func open_journal() -> void:
+	_journal = JournalView.new()
+	_journal.closed.connect(func(): _journal = null; _refresh())
+	add_child(_journal)
 
 
 func _open_lab() -> void:
@@ -98,7 +106,7 @@ func _open_lab() -> void:
 
 
 func _refresh() -> void:
-	var values := ["", "on" if Settings.rhythm_assist else "off",
+	var values := ["", "", "on" if Settings.rhythm_assist else "off",
 		"%+d ms" % int(round(Settings.input_offset * 1000.0)), "", "on" if Settings.screen_shake else "off"]
 	for i in LINES.size():
 		var v: String = values[i]

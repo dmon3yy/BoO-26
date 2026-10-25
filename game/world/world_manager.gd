@@ -9,7 +9,8 @@ extends Node2D
 ## It also owns what happens *in* the world rather than to Orpheus himself:
 ## resting at Hearths, dying on hazards and respawning, and the auto-map.
 ## Since M2 it also opens song seals, layers the music around fights, and
-## runs the HUD and pause menu.
+## runs the HUD and pause menu. Since M3: pickups and olives, gates, people
+## to talk to, the olive pile your echo guards, and Hermes's narration.
 
 const VIEW := Vector2(480, 270)
 const SCROLL_TIME := 0.38
@@ -22,6 +23,7 @@ const HEARTH_REACH := 20.0
 const FADE_TIME := 0.3
 ## Enemies this close (px) count as a fight: the drums come in.
 const FIGHT_RANGE := 180.0
+const TALK_REACH := 26.0
 
 var cell_px: Vector2
 var room_cells: Dictionary = {}      # Vector2i grid cell -> room id
@@ -50,6 +52,11 @@ var _hud: Hud
 var _shake := 0.0
 var _last_hp := -1
 var _pause: PauseMenu
+var _narrator: Narrator
+var _talking := false
+var _last_safe := Vector2.ZERO      # last solid footing, where a death leaves its olives
+var _last_safe_room := ""
+var _pile: Loot.OlivePile
 
 
 func _ready() -> void:
@@ -103,7 +110,14 @@ func _ready() -> void:
 		and not is_instance_valid(_toast) and not _map.visible
 	_pause.closed.connect(func(): Music.play_theme(ContentDB.json("themes").get(_theme_id, {}).get("music", "")))
 	add_child(_pause)
+	_narrator = Narrator.new()
+	add_child(_narrator)
 	Events.song_played.connect(_on_song_played)
+	Events.enemy_defeated.connect(_on_enemy_defeated)
+	Events.flag_set.connect(func(f): _open_gates(); _narrate("flag:" + String(f)))
+	Events.ability_gained.connect(func(a): _open_gates(); _narrate("ability:" + String(a)))
+	Events.narrate.connect(_narrate)
+	Events.shake.connect(func(t): if Settings.screen_shake: _shake = maxf(_shake, t))
 	# A small screen shake when Orpheus is hurt (Pause > Screen shake turns it off).
 	Events.player_hp_changed.connect(func(hp, _m):
 		if hp < _last_hp and Settings.screen_shake:
@@ -157,7 +171,9 @@ func _enter(room_id: String) -> void:
 	GameState.room_id = room_id
 	GameState.visited_rooms[room_id] = true
 	_apply_theme(current.data.header.get("theme", ""))
+	_place_dropped_olives()
 	Events.room_entered.emit(room_id)
+	_narrate("room:" + room_id)
 	_apply_debug(current)
 	# Keep only this room and its direct neighbours built.
 	for id in rooms.keys():
@@ -276,7 +292,11 @@ func _physics_process(delta: float) -> void:
 	if _touching_hazard() or _fell_out_of_world() or player.kit.is_dead():
 		die()
 		return
-	_update_hearth_prompt()
+	if player.is_on_floor() and not _touching_hazard():
+		_last_safe = player.global_position
+		_last_safe_room = current.data.id
+	_collect_things()
+	_update_prompt()
 	_layer_music()
 	if not current.rect.has_point(player.global_position + Vector2(0, -8)):
 		var next := room_at(player.global_position + Vector2(0, -8))
@@ -357,7 +377,9 @@ func die() -> void:
 	_busy = true
 	player.frozen = true
 	var at := player.global_position
-	GameState.drop_olives_on_death(current.data.id, at)
+	var drop_room := _last_safe_room if _last_safe_room != "" else current.data.id
+	GameState.drop_olives_on_death(drop_room, _last_safe if _last_safe != Vector2.ZERO else at)
+	GameState.deaths += 1
 	Events.player_died.emit(at, current.data.id)
 	# A beat of stillness so the hit registers before the screen goes dark.
 	Hitstop.freeze(get_tree(), 0.12)
@@ -367,10 +389,12 @@ func die() -> void:
 	var spawn := respawn_point()
 	place_player(spawn[0], spawn[1])
 	player.kit.restore()
+	_place_dropped_olives()
 	await get_tree().create_timer(0.25).timeout
 	await _fade_to(0.0)
 	player.frozen = false
 	_busy = false
+	_narrate("death:%d" % GameState.deaths)
 
 
 ## [room_id, world position] of the last Hearth rested at, or the start.
@@ -409,15 +433,196 @@ func _nearest_hearth() -> Vector2:
 	return Vector2.INF
 
 
-func _update_hearth_prompt() -> void:
+## What UP would do here: rest at a Hearth, or talk to someone.
+func _update_prompt() -> void:
 	var h := _nearest_hearth()
-	_prompt.visible = h != Vector2.INF and not is_instance_valid(_toast) and player.kit.state == "free"
+	var npc := _nearest_npc()
+	for n in current.npcs:
+		n.look_at_x(player.global_position.x)
+	var free := not is_instance_valid(_toast) and player.kit.state == "free" and not player.crouching
+	_prompt.visible = free and (h != Vector2.INF or npc != null)
 	if not _prompt.visible:
 		return
-	_prompt.text = "UP: rest"
-	_prompt.position = (h - camera.position + VIEW * 0.5 + Vector2(-14, -44)).round()
+	var at := h
+	if npc:
+		at = npc.global_position
+		_prompt.text = "UP: " + String(npc.spec.get("verb", "talk"))
+	else:
+		_prompt.text = "UP: rest"
+	_prompt.position = (at - camera.position + VIEW * 0.5 + Vector2(-14, -50 if npc else -44)).round()
 	if player.just_pressed(&"up"):
-		rest_at(h)
+		if npc:
+			talk_to(npc)
+		else:
+			rest_at(h)
+
+
+func _nearest_npc() -> Npc:
+	if not player.is_on_floor():
+		return null
+	for n in current.npcs:
+		if absf(n.global_position.x - player.global_position.x) <= TALK_REACH \
+				and absf(n.global_position.y - player.global_position.y) < 24.0:
+			return n
+	return null
+
+
+## Start a conversation. Dialogue files can change the world through
+## `do World.something()`: this node is passed to them as "World".
+func talk_to(npc: Npc) -> void:
+	_busy = true
+	_talking = true
+	_prompt.visible = false
+	player.frozen = true
+	player.velocity = Vector2.ZERO
+	player.facing = 1 if npc.global_position.x > player.global_position.x else -1
+	var box := DialogueBox.new()
+	add_child(box)
+	await box.start(load("res://content/dialogue/%s.dialogue" % npc.spec["dialogue"]), npc.dialogue_title(), [{"World": self}])
+	if box.visible:
+		await box.finished
+	box.queue_free()
+	var flag: String = npc.spec.get("met_flag", "")
+	if flag != "":
+		GameState.set_flag(StringName(flag))
+	# A short pause so the button that closed the dialogue doesn't also jump.
+	await get_tree().create_timer(0.15).timeout
+	player.frozen = false
+	_talking = false
+	_busy = false
+
+
+# --- What dialogue can do (`do World.<name>()` in a .dialogue file) ----------
+
+## Zeus restrings the lyre with gold and teaches his song.
+func restring_lyre() -> void:
+	GameState.grant_ability(&"lyre")
+	GameState.grant_ability(&"song:zeus")
+	Sfx.play("res://game/audio/sfx/lyre_up.wav", -2.0)
+	Burst.spawn(current, player.global_position + Vector2(0, -20), UiKit.GOLD, 30.0, 0.6)
+	_hud.flash_text("The lyre is strung. Song of Zeus: up, left, right, up")
+
+
+## Trade olives for Ambrosia: one more heart, and a full heal.
+func buy_ambrosia(cost: int) -> void:
+	if GameState.olives < cost:
+		return
+	GameState.add_olives(-cost)
+	GameState.max_hp += 2
+	GameState.set_flag(&"bought_ambrosia")
+	player.kit.restore(true)
+	Sfx.hit("pickup", -2.0)
+	Burst.spawn(current, player.global_position + Vector2(0, -16), Color(1.0, 0.85, 0.5), 24.0, 0.5)
+
+
+# --- Things to pick up -------------------------------------------------------
+
+func _collect_things() -> void:
+	var body := player.hurtbox().grow(2.0)
+	for room in rooms.values():
+		for id in room.pickups.keys():
+			var p: Dictionary = room.pickups[id]
+			if body.has_point(p["at"] + Vector2(0, -6)) or body.has_point(p["at"] + Vector2(0, -14)):
+				_pick_up(room, id)
+	for o in get_tree().get_nodes_in_group(&"loose_olives"):
+		if o.ready_to_collect() and body.grow(4.0).has_point(o.global_position + Vector2(0, -3)):
+			o.queue_free()
+			GameState.add_olives(1)
+			Sfx.hit("olive", -10.0, randf_range(0.95, 1.1))
+	if is_instance_valid(_pile) and not _pile.guarded() and body.grow(4.0).has_point(_pile.global_position + Vector2(0, -4)):
+		var got := GameState.recover_dropped_olives()
+		Burst.spawn(_pile.get_parent(), _pile.global_position + Vector2(0, -8), Color(0.6, 0.75, 1.0), 20.0, 0.5)
+		Sfx.hit("pickup", -4.0)
+		_pile.queue_free()
+		_pile = null
+		Events.narrate.emit("olives_back")
+		_hud.flash_text("Recovered %d olives" % got)
+
+
+func _pick_up(room: Room, id: String) -> void:
+	var p: Dictionary = room.pickups[id]
+	room.pickups.erase(id)
+	GameState.collected[id] = true
+	var params: Dictionary = p["params"]
+	match p["kind"]:
+		"olive":
+			GameState.add_olives(int(params.get("amount", 1)))
+			Sfx.hit("olive", -8.0)
+		"ambrosia":
+			GameState.max_hp += 2
+			player.kit.restore(true)
+			Sfx.hit("pickup", -2.0)
+			_hud.flash_text("Ambrosia! One more heart")
+		"pickup":
+			var ability := StringName(params.get("ability", ""))
+			GameState.grant_ability(ability)
+			Sfx.hit("pickup", -2.0)
+			_hud.flash_text(String(ContentDB.json("items").get(String(ability), {}).get("name", ability)))
+	Burst.spawn(room, p["at"] + Vector2(0, -8), UiKit.GOLD, 12.0, 0.3)
+	for n in p["nodes"]:
+		n.queue_free()
+
+
+func _on_enemy_defeated(_kind: String, at: Vector2, olives: int) -> void:
+	if olives > 0:
+		var room: Room = rooms.get(room_at(at), current)
+		Loot.scatter(room, at, olives)
+
+
+## The olives Orpheus dropped when he died, and the echo that guards them.
+func _place_dropped_olives() -> void:
+	var d: Dictionary = GameState.dropped_olives
+	if is_instance_valid(_pile) and (d.is_empty() or _pile.get_meta("at") != Vector2(d["x"], d["y"])):
+		if is_instance_valid(_pile.echo):
+			_pile.echo.queue_free()
+		_pile.queue_free()
+		_pile = null
+	if d.is_empty() or is_instance_valid(_pile) or not rooms.has(d["room"]):
+		return
+	var room: Room = rooms[d["room"]]
+	var at := Vector2(d["x"], d["y"])
+	_pile = Loot.OlivePile.new()
+	_pile.amount = int(d["amount"])
+	_pile.set_meta("at", at)
+	room.add_child(_pile)
+	_pile.global_position = at
+	var echo := Enemy.create("echo") as Echo
+	echo.pile = _pile
+	room.add_child(echo)
+	echo.global_position = at + Vector2(-18, 0)
+	echo.home = echo.global_position
+	_pile.echo = echo
+
+
+# --- Gates --------------------------------------------------------------------
+
+## Open any gate whose condition is now met (a flag raised, an ability gained).
+func _open_gates() -> void:
+	for room in rooms.values():
+		for id in room.gates.keys():
+			var g: Dictionary = room.gates[id]
+			if GameState.has(g["needs"]):
+				room.gates.erase(id)
+				Sfx.hit("gate_open", -2.0)
+				for n in g["nodes"]:
+					if n is CanvasItem:
+						var tw := create_tween()
+						tw.tween_property(n, "position:y", n.position.y - 44.0, 1.2).set_trans(Tween.TRANS_SINE)
+						tw.parallel().tween_property(n, "modulate:a", 0.0, 1.2)
+						tw.tween_callback(n.queue_free)
+					else:
+						n.queue_free()
+
+
+# --- Hermes --------------------------------------------------------------------
+
+## Hermes speaks the lines for `key` in content/narration.json, once per game.
+func _narrate(key: String) -> void:
+	var lines: Array = ContentDB.json("narration").get(key, [])
+	if lines.is_empty() or GameState.told.has(key):
+		return
+	GameState.told[key] = true
+	_narrator.say(lines)
 
 
 ## Kneel at a Hearth of Hestia: this becomes the respawn point, the game is
@@ -434,6 +639,7 @@ func rest_at(h: Vector2) -> void:
 	Save.save_game(0)
 	Events.hearth_rested.emit(GameState.hearth_id)
 	_show_word(Save.make_word())
+	_narrate("hearth")
 	await get_tree().create_timer(0.6).timeout
 	player.frozen = false
 	_busy = false

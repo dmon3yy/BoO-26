@@ -35,7 +35,10 @@
     "met_hephaestus",
     "met_ares",
     "met_artemis",
-    "met_persephone"
+    "met_persephone",
+    "met_eurydice",
+    "beat_bull",
+    "bought_ambrosia"
   ],
   "seasons": [
     "winter",

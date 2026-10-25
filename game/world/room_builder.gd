@@ -279,6 +279,7 @@ static func _build_entities(room: Room, data: RoomData) -> void:
 	var entity_kinds: Dictionary = legend.get("entities", {})
 	var props := ContentDB.json("props")
 	var enemies := ContentDB.json("enemies")
+	var npcs := ContentDB.json("npcs")
 	for y in data.height:
 		for x in data.width:
 			var ch := data.char_at(x, y)
@@ -294,21 +295,43 @@ static func _build_entities(room: Room, data: RoomData) -> void:
 				"player_start":
 					room.player_start = room.position + foot
 				_ when enemies.has(kind):
+					var flag: String = enemies[kind].get("defeat_flag", "")
+					if flag != "" and GameState.has(flag):
+						continue     # a guardian stays beaten
 					var e := Enemy.create(kind)
 					e.position = foot
 					room.add_child(e)
+				_ when npcs.has(kind):
+					var npc := Npc.new()
+					npc.who = kind
+					npc.position = foot
+					room.add_child(npc)
+					room.npcs.append(npc)
 				_:
 					if kind == "hearth":
 						room.hearths.append(room.position + foot)
 					var entity_id := "%s:%s_%d_%d" % [data.id, kind, x, y]
-					if kind == "song_seal" and GameState.collected.has(entity_id):
-						continue     # already sung open
-					if props.has(kind):
-						var made := _spawn_prop(room, props[kind], foot, entity_id)
-						if kind == "song_seal":
-							var params: Dictionary = data.legend[ch]["params"] if data.legend.has(ch) else {}
-							room.seals[entity_id] = {"song": params.get("song", ""), "at": room.position + foot,
-								"nodes": made}
+					var params: Dictionary = data.legend[ch]["params"] if data.legend.has(ch) else {}
+					if GameState.collected.has(entity_id):
+						continue     # sung open, picked up
+					if kind == "pickup" and GameState.has(params.get("ability", "")):
+						continue
+					if kind == "gate" and GameState.has(params.get("needs", "")):
+						continue     # already open
+					var look: String = params.get("look", kind)
+					if kind == "pickup" and not params.has("look"):
+						look = "item_" + String(params.get("ability", "")).replace("song:", "song_")
+					if props.has(look):
+						var made := _spawn_prop(room, props[look], foot, entity_id)
+						match kind:
+							"song_seal":
+								room.seals[entity_id] = {"song": params.get("song", ""), "at": room.position + foot,
+									"nodes": made}
+							"gate":
+								room.gates[entity_id] = {"needs": params.get("needs", ""), "nodes": made}
+							_ when props[look].has("pickup") or kind == "pickup":
+								room.pickups[entity_id] = {"kind": kind, "params": params,
+									"at": room.position + foot, "nodes": made}
 
 
 ## Builds a prop and returns every node it made (so a seal can be removed).

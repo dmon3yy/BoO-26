@@ -24,6 +24,8 @@ var size := Vector2(12, 12)
 var home := Vector2.ZERO
 var anim := ""
 var sprite: Sprite2D
+## Multiplies the sprite colour (the echo is a pale blue ghost of Orpheus).
+var tint := Color.WHITE
 
 var _anims: Dictionary
 var _frame_w := 32
@@ -44,6 +46,9 @@ static func create(enemy_kind: String) -> Enemy:
 		"satyr": e = Satyr.new()
 		"bat": e = Bat.new()
 		"snake": e = Snake.new()
+		"scorpion": e = Scorpion.new()
+		"echo": e = Echo.new()
+		"colchis_bull": e = Bull.new()
 		_: return null
 	e.kind = enemy_kind
 	return e
@@ -65,6 +70,8 @@ func _ready() -> void:
 	shape.position = Vector2(0, -size.y * 0.5)
 	add_child(shape)
 
+	if spec.has("tint"):
+		tint = Color(spec["tint"][0], spec["tint"][1], spec["tint"][2], spec["tint"][3])
 	var base := "res://game/art/characters/" + String(spec["rig"])
 	var meta: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(base + ".json"))
 	_anims = meta["anims"]
@@ -109,6 +116,11 @@ func charm(seconds: float) -> void:
 
 
 func is_harmless() -> bool:
+	return _disabled()
+
+
+## Staggered or charmed: it can't act, and doesn't hear the beat.
+func _disabled() -> bool:
 	return _stagger > 0.0 or _charm > 0.0
 
 
@@ -170,10 +182,10 @@ func _physics_process(delta: float) -> void:
 	var b := floori(beat_clock())
 	if b != _last_beat:
 		_last_beat = b
-		if not is_harmless():
+		if not _disabled():
 			_on_beat(b)
 
-	if is_harmless():
+	if _disabled():
 		velocity.x = _knock
 		_knock = move_toward(_knock, 0.0, 500.0 * delta)
 	else:
@@ -218,6 +230,7 @@ func _animate(delta: float) -> void:
 
 func _die() -> void:
 	Sfx.hit("enemy_die", -4.0)
+	Events.enemy_defeated.emit(kind, hurtbox().get_center(), int(spec.get("olives", 0)))
 	Burst.spawn(get_parent(), hurtbox().get_center(), Color(1.0, 0.9, 0.7), 18.0, 0.35)
 	var p := CPUParticles2D.new()
 	p.one_shot = true

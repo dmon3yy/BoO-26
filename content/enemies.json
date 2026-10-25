@@ -1,5 +1,5 @@
 {
-  "_help": "Enemies, in pixels, seconds and hit points. Enemies move freely but ATTACK ON THE BEAT: a wind-up starts on one beat and strikes on a later one, so the music tells you when to dodge or parry. 'olive_drop' is unused until olives arrive in M3.",
+  "_help": "Enemies, in pixels, seconds and hit points. Enemies move freely but ATTACK ON THE BEAT: a wind-up starts on one beat and strikes on a later one, so the music tells you when to dodge or parry. 'olives' is how many olives it drops when beaten. A guardian with a 'defeat_flag' raises that flag when beaten and never comes back.",
   "satyr": {
     "char": "s",
     "rig": "satyr",
@@ -7,11 +7,18 @@
     "contact_damage": 2,
     "walk_speed": 34,
     "charge_speed": 190,
-    "sight": [150, 40],
+    "sight": [
+      150,
+      40
+    ],
     "windup_beats": 1,
     "charge_time": 0.55,
     "rest_beats": 2,
-    "size": [14, 28]
+    "size": [
+      14,
+      28
+    ],
+    "olives": 3
   },
   "bat": {
     "char": "v",
@@ -22,7 +29,11 @@
     "swoop_speed": 130,
     "swoop_beats": 2,
     "rest_beats": 2,
-    "size": [12, 8]
+    "size": [
+      12,
+      8
+    ],
+    "olives": 1
   },
   "snake": {
     "char": "n",
@@ -33,6 +44,77 @@
     "spit_every_beats": 4,
     "spit_speed": 110,
     "spit_damage": 2,
-    "size": [18, 12]
+    "size": [
+      18,
+      12
+    ],
+    "olives": 2
+  },
+  "scorpion": {
+    "char": "x",
+    "rig": "scorpion",
+    "hp": 3,
+    "contact_damage": 2,
+    "walk_speed": 22,
+    "sight": 56,
+    "sting_reach": 22,
+    "sting_damage": 2,
+    "rest_beats": 2,
+    "size": [
+      18,
+      8
+    ],
+    "olives": 2,
+    "_note": "Low to the ground: a standing swing passes over it. Crouch (hold Down) and strike."
+  },
+  "echo": {
+    "rig": "orpheus",
+    "hp": 6,
+    "contact_damage": 1,
+    "walk_speed": 40,
+    "sight": 120,
+    "leash": 72,
+    "swing_reach": [
+      26,
+      22
+    ],
+    "swing_damage": 2,
+    "size": [
+      10,
+      30
+    ],
+    "olives": 0,
+    "tint": [
+      0.55,
+      0.75,
+      1.0,
+      0.7
+    ],
+    "_note": "What's left of Orpheus where he last fell. It guards the olives he dropped."
+  },
+  "colchis_bull": {
+    "char": "B",
+    "rig": "colchis_bull",
+    "name": "The Colchis Bull",
+    "hp": 24,
+    "boss": true,
+    "defeat_flag": "beat_bull",
+    "needs": "club",
+    "contact_damage": 1,
+    "charge_damage": 3,
+    "wake_range": 170,
+    "walk_speed": 30,
+    "charge_speed": 250,
+    "charge_max": 1.8,
+    "stun_beats": 4,
+    "flame_range": 96,
+    "flame_damage": 2,
+    "flame_from_hp": 12,
+    "size": [
+      40,
+      30
+    ],
+    "olives": 15,
+    "_note": "A bronze machine from Hephaestus's forge, or a copy of one. Its armoured front shrugs off the club: dodge its charge, strike its back, or hit it while it's dazed against a wall."
   }
 }

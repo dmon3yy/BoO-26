@@ -1,0 +1,28 @@
+~ start
+
+if GameState.get_flag("met_eurydice")
+	=> again
+Eurydice: That's my fire you're warming your hands at. Well. Hestia's. But I lit it.
+Orpheus: I'm only passing through. I'm going to see about the winter.
+Eurydice: "See about it." Like it's a leaking roof.
+- It is, sort of. A broken season.
+	Eurydice: And you're the one to mend it. With that lyre? Half its strings are frozen through.
+- I'm going to write a song that brings back spring.
+	Eurydice: People have been singing at this winter for months. It hasn't noticed.
+- Have you eaten today?
+	Eurydice: Have you? Don't answer. I can count your ribs from here.
+Eurydice: Look. If you really are going up the mountain, the shepherds' path runs east past the old temple. Zeus keeps an altar at the top.
+Eurydice: Gods like an offering. You've got nothing, so bring him a good story.
+Orpheus: And when the song's finished?
+Eurydice: Then come back and play it for me. I'll be right here. Where else would I go?
+do GameState.set_flag("met_eurydice")
+=> END
+
+~ again
+
+if GameState.get_flag("beat_bull")
+	Eurydice: They say a bronze bull went down to a shepherd with a stick. Was that you? You don't look like much.
+	Eurydice: Keep going. I'm still waiting on that song.
+	=> END
+Eurydice: Still here. Still cold. Go on, singer. The altar's at the top of the climb, past the brook.
+=> END
