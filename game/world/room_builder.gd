@@ -346,6 +346,8 @@ static func _spawn_prop(room: Room, spec: Dictionary, foot: Vector2, entity_id: 
 	var anchor := foot
 	if spec.get("hang", false):
 		anchor = foot + Vector2(0, -T)   # hangs from the tile above, bottom at mid-tile
+	elif spec.get("drip", false):
+		anchor = foot + Vector2(0, size.y - T)   # top edge against the ceiling above
 	sprite.position = anchor + Vector2(0, -size.y / 2.0)
 	sprite.z_index = int(spec.get("z", 0))
 	sprite.set_meta("entity_id", entity_id)

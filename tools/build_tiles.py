@@ -138,6 +138,7 @@ def snow_cap(p, c, col, height, min_depth=2.0, extra=3.0):
 class LimestoneSnow(Material):
     palette = "arcadia_winter"
     voronoi_points = 34
+    snow = True
 
     def draw(self, c):
         p = self.p
@@ -152,12 +153,19 @@ class LimestoneSnow(Material):
         tone = np.where(down <= 1, tone - 0.3, tone)         # underside
         col = pick(p, ["stone0", "stone1", "stone2", "stone3", "stone4", "stone5"], np.clip(tone, 0, 0.999))
         height = 0.3 + 0.5 * bevel + 0.35 * (1 - np.exp(-d / 2.0)) + 0.06 * n2
-        col, height = snow_cap(p, c, col, height)
+        if self.snow:
+            col, height = snow_cap(p, c, col, height)
         return col, height, None
+
+
+class LimestoneCave(LimestoneSnow):
+    """The same rock underground: no snow, a little frost on the lit rims."""
+    snow = False
 
 
 class MarbleSnow(Material):
     palette = "arcadia_winter"
+    snow = True
 
     def draw(self, c):
         p = self.p
@@ -179,8 +187,14 @@ class MarbleSnow(Material):
         col = np.where((vein & ~joint)[..., None], p["vein"], col)
         bevel = np.minimum(np.minimum(gy % 8, 7 - gy % 8), np.minimum(bx, 15 - bx))
         height = 0.55 + 0.12 * np.minimum(bevel, 2) - np.where(joint, 0.45, 0) + 0.25 * (1 - np.exp(-d / 2))
-        col, height = snow_cap(p, c, col, height, min_depth=1.5, extra=2.0)
+        if self.snow:
+            col, height = snow_cap(p, c, col, height, min_depth=1.5, extra=2.0)
         return col, height, None
+
+
+class MarbleCrypt(MarbleSnow):
+    """Temple masonry under the ground, where no snow falls."""
+    snow = False
 
 
 class LimestoneBack(Material):
@@ -288,6 +302,8 @@ MATERIALS = {
     "limestone_snow": LimestoneSnow,
     "marble_snow": MarbleSnow,
     "limestone_back": LimestoneBack,
+    "limestone_cave": LimestoneCave,
+    "marble_crypt": MarbleCrypt,
     "iron_plate": IronPlate,
     "basalt": Basalt,
     "iron_back": IronBack,

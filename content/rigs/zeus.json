@@ -1,0 +1,37 @@
+{
+  "_help": [
+    "Zeus: a robe instead of legs, so his whole lower half is one part that sways a little.",
+    "His bolt arm lifts and settles as if he's weighing whether to use it."
+  ],
+  "sprite": "zeus",
+  "palette": "zeus",
+  "frame": [44, 64],
+  "hip": [21, 44],
+  "parts": {
+    "uarm_b": {"grid": "uarm", "pivot": [2, 1], "parent": "torso", "attach": [4, 2], "shade": 0.7},
+    "farm_b": {"grid": "farm", "pivot": [1, 0], "parent": "uarm_b", "attach": [2, 7], "shade": 0.7},
+    "robe": {"grid": "robe", "pivot": [7, 0], "parent": "hip"},
+    "torso": {"grid": "torso", "pivot": [6, 11], "parent": "hip"},
+    "head": {"grid": "head", "pivot": [6, 14], "parent": "torso", "attach": [7, 1]},
+    "uarm_f": {"grid": "uarm", "pivot": [2, 1], "parent": "torso", "attach": [8, 2]},
+    "farm_f": {"grid": "farm", "pivot": [1, 0], "parent": "uarm_f", "attach": [2, 7]},
+    "bolt": {"grid": "bolt", "pivot": [3, 4], "parent": "farm_f", "attach": [1, 6]}
+  },
+  "draw_order": ["uarm_b", "farm_b", "robe", "torso", "head", "uarm_f", "farm_f", "bolt"],
+  "anims": {
+    "idle": {
+      "frames": 8,
+      "fps": 5,
+      "hip_dy": {"mean": 0},
+      "torso_dy": {"mean": 0.5, "amp": 0.5, "phase": 0.25},
+      "robe": {"mean": 0, "amp": 1},
+      "torso": {"mean": -2, "amp": 1},
+      "head": {"mean": 0, "amp": 2, "phase": 0.1},
+      "uarm_f": {"mean": -85, "amp": 4},
+      "farm_f": {"mean": -75, "amp": 5, "phase": 0.1},
+      "bolt": {"mean": 160, "amp": 3},
+      "uarm_b": {"mean": 15, "amp": 2, "phase": 0.5},
+      "farm_b": {"mean": -20}
+    }
+  }
+}

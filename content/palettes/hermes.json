@@ -1,0 +1,15 @@
+{
+  "name": "Hermes",
+  "notes": "Slate and silver with a sea-teal cloak: a traveller's colours. The white of his wings and the caduceus gold are the brightest things on him.",
+  "colors": {
+    "p": "#38444c", "P": "#64767e",
+    "W": "#eef2f4", "w": "#a8b6be",
+    "h": "#2a1c14", "s": "#8a5a3c", "S": "#b88058", "e": "#140c14",
+    "c": "#7e8a94", "C": "#c4ced4",
+    "m": "#1c4a52", "M": "#2e767c",
+    "l": "#3a3028", "L": "#6a5a40",
+    "b": "#24525a", "B": "#3a8488",
+    "n": "#4a3420", "N": "#7a5a36",
+    "y": "#8a6a20", "Y": "#d8b048", "g": "#4a8a4a"
+  }
+}

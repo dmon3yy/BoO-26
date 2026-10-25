@@ -1,0 +1,12 @@
+{
+  "name": "Zeus",
+  "notes": "Cloud-white hair, sky-blue robe, a gold wreath and hem: the only figure in Arcadia dressed for summer. The bolt is near-white gold.",
+  "colors": {
+    "W": "#eef0f4", "w": "#a8b0c4",
+    "Y": "#e8c050", "y": "#9a7420",
+    "S": "#d0a07a", "s": "#9a6a4c", "e": "#1a1420",
+    "R": "#b8c8e4", "r": "#56688c", "q": "#8496b8",
+    "n": "#6a4a2a", "N": "#9a7240",
+    "B": "#fff6c0", "b": "#f0c040"
+  }
+}

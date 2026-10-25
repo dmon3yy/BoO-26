@@ -33,6 +33,10 @@
     "E": "eurydice",
     "M": "hermes",
     "B": "colchis_bull",
-    "x": "scorpion"
+    "x": "scorpion",
+    "a": "altar",
+    "p": "pine",
+    "i": "stalactites",
+    "r": "signpost"
   }
 }

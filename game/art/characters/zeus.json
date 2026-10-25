@@ -1,0 +1,19 @@
+{
+  "frame_size": [
+    44,
+    64
+  ],
+  "origin": [
+    21,
+    61
+  ],
+  "anims": {
+    "idle": {
+      "start": 0,
+      "count": 8,
+      "fps": 5,
+      "loop": true
+    }
+  },
+  "frames": 8
+}

@@ -61,8 +61,8 @@
   },
   "arcadia_cave": {
     "solid": {
-      "#": "limestone_snow",
-      "%": "marble_snow"
+      "#": "limestone_cave",
+      "%": "marble_crypt"
     },
     "back": {
       "b": "limestone_back"
@@ -71,9 +71,9 @@
     "spikes": "spikes_ice",
     "fluid": "ice_water",
     "ambient": [
-      0.3,
-      0.32,
-      0.46
+      0.38,
+      0.4,
+      0.54
     ],
     "particles": "",
     "music": "arcadia",
@@ -210,8 +210,8 @@
   },
   "arcadia_crypt": {
     "solid": {
-      "#": "limestone_snow",
-      "%": "marble_snow"
+      "#": "limestone_cave",
+      "%": "marble_crypt"
     },
     "back": {
       "b": "limestone_back"

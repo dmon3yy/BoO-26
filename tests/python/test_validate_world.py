@@ -174,7 +174,7 @@ def test_rooms_join_when_openings_match(tmp_path):
     assert rep.ok(), rep.errors
 
 
-@pytest.mark.parametrize("bad", ["x"])
+@pytest.mark.parametrize("bad", ["@", "?"])
 def test_unknown_character(tmp_path, bad):
     g = blank()
     g[13][3] = "P"

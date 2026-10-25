@@ -22,6 +22,7 @@ static func spawn(parent: Node, at: Vector2, tint: Color, size: float = 14.0, se
 
 func _ready() -> void:
 	material = FxNodes.unshaded()
+	process_mode = Node.PROCESS_MODE_ALWAYS     # finishes even while a conversation pauses the world
 
 
 func _process(delta: float) -> void:

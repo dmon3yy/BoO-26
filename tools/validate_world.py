@@ -57,6 +57,7 @@ class World:
         self.legend = load_json("legend", base)
         self.movement = load_json("movement", base)
         self.themes = load_json("themes", base)
+        self.props = load_json("props", base) if (base / "props.json").exists() else {}
         self.npcs = load_json("npcs", base) if (base / "npcs.json").exists() else {}
         self.enemies = load_json("enemies", base) if (base / "enemies.json").exists() else {}
         self.cw, self.ch = self.world["cell"]
@@ -242,7 +243,9 @@ def solve(w: World, rep: Report) -> None:
 
     # Everything that matters must be reachable with the final abilities.
     for e in w.entities:
-        if e["kind"] in ("player_start", "torch", "lantern", "column", "broken_column", "olive_tree") or \
+        decor = e["kind"] in w.props and "pickup" not in w.props[e["kind"]] and \
+            e["kind"] not in ("hearth", "song_seal", "gate")
+        if decor or e["kind"] == "player_start" or \
                 (e["kind"] in w.enemies and not w.enemies[e["kind"]].get("defeat_flag")):
             continue
         need = w.needs(e)

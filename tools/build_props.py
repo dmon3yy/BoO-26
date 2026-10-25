@@ -250,6 +250,155 @@ def spikes(name: str, palette: str, ramp: list[str]):
     c.save(name)
 
 
+def item_club():
+    """A thick olive branch snapped off by the frost: Orpheus's first weapon."""
+    p = load_palette("arcadia_winter")
+    W, H = 14, 18
+    c = Canvas(W, H)
+    for t in np.linspace(0, 1, 60):
+        x = 3 + t * 8
+        y = 16 - t * 13 + np.sin(t * 5) * 0.8
+        r = 1.8 - t * 0.6
+        m = (np.abs(c.xs - x) <= r) & (np.abs(c.ys - y) <= r)
+        c.paint(m, ramp_pick(p, ["bark0", "bark1", "bark2"], np.clip(0.3 + 0.4 * (c.xs - x) / -2 + 0.3, 0, 0.999)), 0.7)
+    twig = (np.abs(c.xs - 9 + (c.ys - 8) * 0.8) < 0.6) & (c.ys >= 4) & (c.ys <= 8)
+    c.paint(twig, p["bark2"], 0.5)
+    leaves = c.ellipse(11, 3, 2.2, 1.4) | c.ellipse(7, 4, 1.6, 1.2)
+    c.paint(leaves, ramp_pick(p, ["leaf1", "leaf2"], np.full(c.xs.shape, 0.5)), 0.6)
+    c.paint(c.rect(10, 2, 11, 2), p["snow3"], 1.0)
+    c.save("item_club")
+
+
+def item_tablet():
+    """A clay tablet with a song scratched into it, glowing faintly gold."""
+    p = load_palette("arcadia_winter")
+    pe = load_palette("erebos")
+    W, H = 14, 18
+    c = Canvas(W, H)
+    slab = c.rect(1, 2, W - 2, H - 1) & ~(c.rect(1, 2, 1, 2) | c.rect(W - 2, 2, W - 2, 2))
+    tone = 0.45 + 0.15 * (value_noise(H, W, 3, 7) - 0.5) + np.where(c.xs < 3, 0.15, 0)
+    c.paint(slab, ramp_pick(pe, ["rust0", "rust1", "rust2"], np.clip(tone, 0, 0.999)), 0.7)
+    gold = np.array([1.0, 0.8, 0.35], np.float32)
+    marks = ((c.ys % 3 == 0) & (c.ys >= 5) & (c.ys <= 15) & (c.xs >= 3) & (c.xs <= W - 4)
+             & ((c.xs * 7 + c.ys * 3) % 5 != 0))
+    c.paint(marks, gold * 0.7, 0.4, emit=gold)
+    c.save("item_song_hymn", emissive=True)
+
+
+def gate_bronze():
+    """Bronze bars that block a doorway until something opens them."""
+    pe = load_palette("erebos")
+    W, H = 16, 48
+    c = Canvas(W, H)
+    bronze = ["brass0", "brass1", "brass2", "brass3"]
+    for bx in (2, 6, 10, 14):
+        bar = (np.abs(c.xs - bx + 0.5) <= 1.2) & (c.ys >= 2)
+        c.paint(bar, ramp_pick(pe, bronze, cylinder_tone(c.xs, bx - 0.5, 1.4)), cylinder_height(c.xs, bx - 0.5, 1.4))
+        tip = c.ellipse(bx - 0.5, 2, 1.6, 2)
+        c.paint(tip, pe["brass3"], 1.0)
+    for by in (12, 30, 44):
+        rail = c.rect(0, by, W - 1, by + 1)
+        c.paint(rail, ramp_pick(pe, bronze, np.full(c.xs.shape, 0.4)), 0.8)
+    c.save("gate_bronze")
+
+
+def olive_pile():
+    """The olives Orpheus dropped when he died: a little heap with a ghostly sheen."""
+    p = load_palette("arcadia_winter")
+    W, H = 16, 9
+    c = Canvas(W, H)
+    rng = np.random.default_rng(4)
+    for i in range(14):
+        cx, cy = rng.uniform(2.5, W - 3.5), H - 2.5 - rng.uniform(0, 3.5) * (1 - abs(i % 7 - 3) / 4)
+        o = c.ellipse(cx, cy, 2.0, 2.4)
+        c.paint(o, ramp_pick(p, ["leaf0", "leaf1", "leaf2"], cylinder_tone(c.xs, cx, 2.0)), cylinder_height(c.xs, cx, 2.0))
+    c.save("olive_pile")
+
+
+def ambrosia():
+    """A small gold-banded jar of ambrosia: one more heart."""
+    p = load_palette("arcadia_winter")
+    pe = load_palette("erebos")
+    W, H = 12, 16
+    c = Canvas(W, H)
+    body = c.ellipse(5.5, 10, 4.6, 5)
+    c.paint(body, ramp_pick(p, ["marble1", "marble2", "marble3", "marble4"], cylinder_tone(c.xs, 5.5, 4.6)),
+            cylinder_height(c.xs, 5.5, 4.6))
+    neck = c.rect(4, 2, 7, 5)
+    c.paint(neck, ramp_pick(p, ["marble2", "marble3"], cylinder_tone(c.xs, 5.5, 2)), 0.8)
+    band = c.rect(1, 9, 10, 10) & body
+    gold = np.array([1.0, 0.82, 0.4], np.float32)
+    c.paint(band, gold * 0.8, 0.9, emit=gold * 0.9)
+    lid = c.rect(3, 1, 8, 2)
+    c.paint(lid, pe["brass2"], 1.0, emit=gold * 0.6)
+    c.save("ambrosia", emissive=True)
+
+
+def altar():
+    """Zeus's altar: a broad marble block with a carved eagle frieze and snow on top."""
+    p = load_palette("arcadia_winter")
+    W, H = 44, 20
+    c = Canvas(W, H)
+    block = c.rect(2, 4, W - 3, H - 1)
+    tone = 0.55 + 0.1 * (value_noise(H, W, 3, 9) - 0.5) - np.where((c.ys == 9) | (c.ys == 15), 0.25, 0)
+    c.paint(block, ramp_pick(p, ["marble0", "marble1", "marble2", "marble3"], np.clip(tone, 0, 0.999)), 0.8)
+    top = c.rect(0, 2, W - 1, 4)
+    c.paint(top, ramp_pick(p, ["marble2", "marble3", "marble4"], np.full(c.xs.shape, 0.7)), 1.0)
+    snow = c.rect(0, 0, W - 1, 1) & ((c.xs * 5) % 7 > 1)
+    c.paint(snow, ramp_pick(p, ["snow2", "snow3"], np.full(c.xs.shape, 0.6)), 1.1)
+    # A zig-zag bolt carved into the frieze.
+    bolt = (np.abs(c.ys - 12 - np.sign(np.sin(c.xs * 0.8)) * 2) < 1) & (c.xs > 8) & (c.xs < W - 9)
+    c.paint(bolt, p["marble0"], 0.3)
+    c.save("altar")
+
+
+def signpost():
+    """A road marker: a stone herm pointing east."""
+    p = load_palette("arcadia_winter")
+    W, H = 18, 34
+    c = Canvas(W, H)
+    post = c.rect(6, 6, 10, H - 1)
+    c.paint(post, ramp_pick(p, ["marble0", "marble1", "marble2", "marble3"], cylinder_tone(c.xs, 8, 3)), 0.8)
+    board = c.rect(1, 8, 14, 13) | (c.rect(15, 9, 15, 12)) | c.rect(16, 10, 16, 11)
+    c.paint(board, ramp_pick(p, ["bark0", "bark1", "bark2"], np.full(c.xs.shape, 0.5)), 0.7)
+    head = c.ellipse(8, 3.5, 3, 3.5)
+    c.paint(head, ramp_pick(p, ["marble1", "marble2", "marble3"], cylinder_tone(c.xs, 8, 3)), 0.9)
+    c.paint(c.rect(1, 7, 14, 7) & ((c.xs % 3) != 0), p["snow3"], 1.0)
+    c.save("signpost")
+
+
+def pine():
+    """A dark mountain pine, snow on its tiers."""
+    p = load_palette("arcadia_winter")
+    W, H = 34, 64
+    c = Canvas(W, H)
+    trunk = c.rect(15, 48, 18, H - 1)
+    c.paint(trunk, ramp_pick(p, ["bark0", "bark1"], cylinder_tone(c.xs, 16.5, 2)), 0.6)
+    noise = value_noise(H, W, 2, 17)
+    for i, (top, half) in enumerate(((2, 5), (12, 9), (22, 12), (32, 15), (40, 16))):
+        tier = (c.ys >= top) & (c.ys <= top + 14) & (np.abs(c.xs - 16.5) <= (c.ys - top) / 14 * half + 1) \
+            & (noise > 0.2)
+        tone = np.clip(0.25 + (16.5 - c.xs) / 40 + (noise - 0.5) * 0.4, 0, 0.999)
+        c.paint(tier, ramp_pick(p, ["leaf0", "leaf1"], tone), 0.5)
+        snow = tier & (c.ys <= top + 3 + np.abs(c.xs - 16.5) * 0.5) & (noise > 0.35)
+        c.paint(snow, ramp_pick(p, ["snow1", "snow2", "snow3"], np.clip(tone + 0.3, 0, 0.999)), 0.9)
+    c.save("pine")
+
+
+def stalactites():
+    """Icicles and stone drips hanging from a cave ceiling."""
+    p = load_palette("arcadia_winter")
+    W, H = 32, 20
+    c = Canvas(W, H)
+    rng = np.random.default_rng(31)
+    for i in range(7):
+        cx, length = 2 + i * 4.3 + rng.uniform(-1, 1), rng.uniform(6, 19)
+        half = np.clip((length - c.ys) / length * 2.2, 0, 3)
+        drip = (np.abs(c.xs + 0.5 - cx) <= half) & (c.ys < length)
+        c.paint(drip, ramp_pick(p, ["ice0", "ice1", "ice2"], np.clip(0.7 - (c.xs - cx) / 5, 0, 0.999)), 0.6)
+    c.save("stalactites")
+
+
 def main():
     spikes("spikes_ice", "arcadia_winter", ["ice0", "ice1", "ice2", "snow2"])
     spikes("spikes_iron", "erebos", ["iron1", "iron2", "iron3", "iron4"])
@@ -262,6 +411,15 @@ def main():
     furnace()
     olive()
     song_seal()
+    item_club()
+    item_tablet()
+    gate_bronze()
+    olive_pile()
+    ambrosia()
+    altar()
+    signpost()
+    pine()
+    stalactites()
 
 
 if __name__ == "__main__":

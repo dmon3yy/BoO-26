@@ -14,6 +14,11 @@ func _ready() -> void:
 	super()
 	add_to_group(&"echoes")
 	collision_mask = Layers.SOLID      # it doesn't stand on ledges it can't see
+	# A ghost: it gives off its own pale light instead of taking the room's.
+	var glow := CanvasItemMaterial.new()
+	glow.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+	glow.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	sprite.material = glow
 
 
 func _on_beat(_index: int) -> void:

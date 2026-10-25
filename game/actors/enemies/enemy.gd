@@ -224,7 +224,7 @@ func _animate(delta: float) -> void:
 		sprite.modulate = Color(1.0, 0.75, 0.9)
 		sprite.position.y = sin(_quiet_time * 6.0) * 1.5
 	else:
-		sprite.modulate = Color.WHITE
+		sprite.modulate = tint
 		sprite.position.y = 0.0
 
 

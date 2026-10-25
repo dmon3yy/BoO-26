@@ -23,7 +23,7 @@ const HEARTH_REACH := 20.0
 const FADE_TIME := 0.3
 ## Enemies this close (px) count as a fight: the drums come in.
 const FIGHT_RANGE := 180.0
-const TALK_REACH := 26.0
+const TALK_REACH := 34.0
 
 var cell_px: Vector2
 var room_cells: Dictionary = {}      # Vector2i grid cell -> room id
@@ -477,11 +477,17 @@ func talk_to(npc: Npc) -> void:
 	player.velocity = Vector2.ZERO
 	player.facing = 1 if npc.global_position.x > player.global_position.x else -1
 	var box := DialogueBox.new()
+	box.at_top = (player.global_position - camera.position).y > 0.0
+	box.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(box)
+	_narrator.visible = false
+	get_tree().paused = true      # the world holds still while people talk
 	await box.start(load("res://content/dialogue/%s.dialogue" % npc.spec["dialogue"]), npc.dialogue_title(), [{"World": self}])
 	if box.visible:
 		await box.finished
 	box.queue_free()
+	get_tree().paused = false
+	_narrator.visible = true
 	var flag: String = npc.spec.get("met_flag", "")
 	if flag != "":
 		GameState.set_flag(StringName(flag))

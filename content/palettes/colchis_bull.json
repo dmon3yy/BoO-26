@@ -1,0 +1,10 @@
+{
+  "name": "Colchis Bull",
+  "notes": "Bronze, from near-black to a hot highlight, with ivory horns. The furnace in its flank and its eyes are the only fire colours on it.",
+  "colors": {
+    "o": "#2a1a0e", "O": "#6a4220", "P": "#a86a30", "Q": "#dca050",
+    "r": "#f0d080", "g": "#24160e", "G": "#4a2e1a", "F": "#ff9a30",
+    "E": "#ffe070", "k": "#140a06",
+    "H": "#ece2c8", "h": "#a8987a", "K": "#2e2016"
+  }
+}

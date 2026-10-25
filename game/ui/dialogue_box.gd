@@ -11,7 +11,13 @@ extends CanvasLayer
 signal finished
 
 const CHARS_PER_SECOND := 45.0
-const BOX := Rect2(8, 192, 464, 70)
+const BOTTOM := Rect2(8, 192, 464, 70)
+const TOP := Rect2(8, 8, 464, 70)
+
+## Where the box sits. The world puts it at the top when the speakers stand
+## low on the screen, so the box never hides who's talking.
+var at_top := false
+var BOX := BOTTOM
 
 var _resource: Resource
 var _states: Array = []
@@ -27,6 +33,7 @@ var _reply_panel: Panel
 
 func _ready() -> void:
 	layer = 20
+	BOX = TOP if at_top else BOTTOM
 	_panel = UiKit.panel(BOX)
 	add_child(_panel)
 	_speaker = UiKit.label("", BOX.position + Vector2(8, 5), UiKit.GOLD)
@@ -68,6 +75,8 @@ func _show_replies() -> void:
 		return
 	_choice = 0
 	var y := BOX.position.y - 12.0 * _line.responses.size() - 4.0
+	if at_top:
+		y = BOX.end.y + 8.0
 	var reply_panel := UiKit.panel(Rect2(BOX.position.x + 180, y - 4, BOX.size.x - 180, 12.0 * _line.responses.size() + 6))
 	add_child(reply_panel)
 	_reply_panel = reply_panel

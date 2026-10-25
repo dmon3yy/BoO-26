@@ -1,0 +1,14 @@
+{
+  "name": "Eurydice",
+  "notes": "Auburn hair, a rust wrap and a cold teal scarf: muted, practical, a little threadbare. Nothing about her is gold.",
+  "colors": {
+    "h": "#2a1410", "H": "#5e2a1a",
+    "s": "#9a6448", "S": "#c8946a", "e": "#140c14",
+    "f": "#24404a", "F": "#4a7a82",
+    "c": "#5e3a22", "C": "#94603a",
+    "l": "#3a2a18", "L": "#6a5030",
+    "k": "#2e2432", "K": "#4c3c4a",
+    "d": "#1c1820", "D": "#2e2a36",
+    "n": "#3a281c", "N": "#5e4430"
+  }
+}

@@ -66,7 +66,7 @@ func _set_shown(on: bool) -> void:
 
 
 func _process(delta: float) -> void:
-	if not _panel.visible or get_tree().paused:
+	if not _panel.visible or get_tree().paused or not visible:
 		return
 	_t += delta
 	_text.visible_characters = int(_t * CHARS_PER_SECOND)

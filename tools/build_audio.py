@@ -399,12 +399,73 @@ def combat_sfx() -> None:
     print("sfx: combat")
 
 
+def world_sfx() -> None:
+    """Pickups, gates and the Colchis Bull: bronze clangs, steam and fire."""
+    rng = np.random.default_rng(41)
+
+    def t_(sec):
+        return np.arange(int(sec * SR)) / SR
+
+    def noise(sec, decay, hp=True):
+        n = rng.uniform(-1, 1, int(sec * SR)).astype(np.float32)
+        if hp:
+            n = n - lowpass(n, 3)
+        return n * np.exp(-t_(sec) * decay).astype(np.float32)
+
+    def tone(freqs, sec, decay, amps=None):
+        t = t_(sec)
+        amps = amps or [1.0] * len(freqs)
+        return sum(a * np.sin(2 * np.pi * f * t) for f, a in zip(freqs, amps)) * np.exp(-t * decay)
+
+    def seq(*parts, gap=0.0):
+        out = np.zeros(0, np.float32)
+        for p in parts:
+            out = np.concatenate([out, np.asarray(p, np.float32), np.zeros(int(gap * SR), np.float32)])
+        return out
+
+    def mixdown(*parts):
+        n = max(len(p) for p in parts)
+        out = np.zeros(n, np.float32)
+        for p in parts:
+            out[: len(p)] += p
+        return out
+
+    # A bell: inharmonic partials, the shape of struck bronze.
+    def bronze(f, sec, decay):
+        return tone([f, f * 2.76, f * 5.4, f * 8.93], sec, decay, [1.0, 0.5, 0.25, 0.12])
+
+    t = t_(1.2)
+    roar_f = 70 + 25 * np.sin(2 * np.pi * 3 * t)
+    roar = np.sign(np.sin(2 * np.pi * np.cumsum(roar_f) / SR)) * 0.4 * np.sin(np.pi * t / 1.2) ** 0.5
+    roar = lowpass(roar.astype(np.float32), 8) + lowpass(noise(1.2, 1.5, False), 5) * 0.6
+    t = t_(0.6)
+    hiss = lowpass(noise(0.6, 0, False), 2) * np.sin(np.pi * t / 0.6).astype(np.float32)
+    fire = lowpass(noise(0.7, 2.5, False), 6) + lowpass(noise(0.7, 4, False), 2) * 0.5
+    sounds = {
+        "olive": tone([1320, 1980], 0.12, 30),
+        "pickup": seq(tone([784, 1568], 0.12, 12), tone([988, 1976], 0.12, 12), tone([1175, 2350], 0.4, 6)),
+        "gate_open": mixdown(bronze(98, 1.4, 2.5) * 0.6, lowpass(noise(1.4, 1.2, False), 10) * 0.5),
+        "bull_roar": roar,
+        "bull_paw": mixdown(lowpass(noise(0.25, 14, False), 3), bronze(140, 0.25, 18) * 0.4),
+        "bull_inhale": hiss[::-1].copy(),
+        "bull_charge": mixdown(hiss * 0.8, bronze(110, 0.6, 5) * 0.3),
+        "bull_crash": mixdown(bronze(73, 1.5, 3), noise(0.4, 10) * 0.8),
+        "bull_clang": mixdown(bronze(220, 0.5, 7), noise(0.08, 60) * 0.5),
+        "bull_flame": fire,
+    }
+    for k, x in sounds.items():
+        x = np.asarray(x, np.float32)
+        write_wav(OUT_SFX / f"{k}.wav", x / (np.max(np.abs(x)) + 1e-9) * 0.7)
+    print("sfx: world")
+
+
 def main(names: list[str]) -> None:
     targets = names or [p.stem for p in sorted(SCORES.glob("*.score"))]
     for n in targets:
         render(n)
     lyre_notes()
     combat_sfx()
+    world_sfx()
 
 
 if __name__ == "__main__":

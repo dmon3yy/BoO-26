@@ -1,0 +1,55 @@
+{
+  "_help": ["Hermes leans on the caduceus and taps a foot: he's always half a beat from leaving."],
+  "sprite": "hermes",
+  "palette": "hermes",
+  "frame": [32, 48],
+  "hip": [15, 29],
+  "parts": {
+    "cloak": {"grid": "cloak", "pivot": [2, 0], "parent": "torso", "attach": [2, 1]},
+    "uarm_b": {"grid": "uarm", "pivot": [2, 1], "parent": "torso", "attach": [3, 2], "shade": 0.7},
+    "farm_b": {"grid": "farm", "pivot": [1, 0], "parent": "uarm_b", "attach": [2, 6], "shade": 0.7},
+    "thigh_b": {"grid": "thigh", "pivot": [2, 1], "parent": "hip", "shade": 0.7},
+    "shin_b": {"grid": "shin", "pivot": [2, 0], "parent": "thigh_b", "attach": [2, 7], "shade": 0.7},
+    "thigh_f": {"grid": "thigh", "pivot": [2, 1], "parent": "hip"},
+    "shin_f": {"grid": "shin", "pivot": [2, 0], "parent": "thigh_f", "attach": [2, 7]},
+    "torso": {"grid": "torso", "pivot": [5, 8], "parent": "hip"},
+    "head": {"grid": "head", "pivot": [5, 10], "parent": "torso", "attach": [5, 0]},
+    "uarm_f": {"grid": "uarm", "pivot": [2, 1], "parent": "torso", "attach": [6, 2]},
+    "farm_f": {"grid": "farm", "pivot": [1, 0], "parent": "uarm_f", "attach": [2, 6]},
+    "caduceus": {"grid": "caduceus", "pivot": [3, 9], "parent": "farm_f", "attach": [1, 6]}
+  },
+  "draw_order": [
+    "cloak",
+    "uarm_b",
+    "farm_b",
+    "thigh_b",
+    "shin_b",
+    "thigh_f",
+    "shin_f",
+    "torso",
+    "head",
+    "caduceus",
+    "uarm_f",
+    "farm_f"
+  ],
+  "anims": {
+    "idle": {
+      "frames": 8,
+      "fps": 8,
+      "hip_dy": {"mean": 0},
+      "torso_dy": {"mean": 0.5, "amp": 0.5, "phase": 0.25},
+      "torso": {"mean": -3, "amp": 1},
+      "head": {"mean": -4, "amp": 3, "harmonic": 2},
+      "thigh_f": {"mean": -18, "amp": 6, "harmonic": 2},
+      "shin_f": {"mean": 20, "amp": 8, "harmonic": 2, "phase": 0.1},
+      "thigh_b": {"mean": 8},
+      "shin_b": {"mean": 3},
+      "uarm_f": {"mean": -20},
+      "farm_f": {"mean": -60},
+      "caduceus": {"mean": 75},
+      "uarm_b": {"mean": 30},
+      "farm_b": {"mean": -80},
+      "cloak": {"mean": 14, "amp": 4, "phase": 0.2}
+    }
+  }
+}

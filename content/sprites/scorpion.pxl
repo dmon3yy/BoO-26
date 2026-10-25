@@ -1,0 +1,30 @@
+; A cave scorpion, facing right: low armoured body, a claw, a jointed tail.
+;   c/C/Q chitin dark to light  e eye  l legs  s/S sting
+
+@body
+...cCCCCCCCc...
+.cCCQCCQCCQCCc.
+cCCCCCCCCCCCCCc
+.cCCCCCCCCCCCe.
+.l.l.l.l.l.l...
+l.l.l.l.l.l....
+
+@claw
+...cc....
+..cCCc.cC
+.cCQCCcCc
+cCCc..cC.
+.cc......
+
+@seg
+.cc.
+cCQc
+cCCc
+.cc.
+
+@sting
+.cs.
+cSs.
+.sS.
+..S.
+..s.

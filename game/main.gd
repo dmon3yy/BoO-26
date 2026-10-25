@@ -5,6 +5,9 @@ extends Node2D
 ##   BOO_START_ROOM  skip the title and start in a specific room
 ##   BOO_CAPTURE     save review frames (see game/spikes/capture.gd); skips the title
 ##   BOO_STATE       "full" gives Orpheus his whole early kit (for captures and testing)
+##   BOO_TITLE       show the title screen even while capturing
+##   BOO_OLIVES      start with this many olives
+##   BOO_DROP        "x,y": olives (half of BOO_OLIVES) already lie there, guarded by an echo
 
 const WorldManager := preload("res://game/world/world_manager.gd")
 const Capture := preload("res://game/spikes/capture.gd")
@@ -22,10 +25,14 @@ func _ready() -> void:
 		get_tree().change_scene_to_file.call_deferred("res://game/spikes/beat_lab.tscn")
 		return
 	var start := OS.get_environment("BOO_START_ROOM")
-	if start != "" or OS.get_environment("BOO_CAPTURE") != "":
+	if (start != "" or OS.get_environment("BOO_CAPTURE") != "") and OS.get_environment("BOO_TITLE") == "":
 		if OS.get_environment("BOO_STATE") == "full":
 			for a in ["lyre", "club", "song:zeus", "song:hymn", "song:charm"]:
 				GameState.grant_ability(StringName(a))
+		GameState.olives = int(OS.get_environment("BOO_OLIVES"))
+		var drop := OS.get_environment("BOO_DROP").split(",")
+		if drop.size() == 2:
+			GameState.drop_olives_on_death(start, Vector2(float(drop[0]), float(drop[1])))
 		_start_world(start if start != "" else GameState.room_id, false)
 		if capture:
 			capture.attach.call_deferred(world.player)
