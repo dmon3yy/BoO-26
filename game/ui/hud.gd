@@ -142,7 +142,8 @@ func _draw_hud() -> void:
 func _draw_note(c: Control, at: Vector2, note: String, col: Color) -> void:
 	var dirs := {"up": Vector2.UP, "down": Vector2.DOWN, "left": Vector2.LEFT, "right": Vector2.RIGHT}
 	if not dirs.has(note):
-		c.draw_circle(at, 2.5, col)
+		# The middle string is played with Jump, so it shows Jump's key.
+		c.draw_string(UiKit.font(), at + Vector2(-2.5, 3.5), "Z", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, col)
 		return
 	var d: Vector2 = dirs[note]
 	var side := Vector2(-d.y, d.x)

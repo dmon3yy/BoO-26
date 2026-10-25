@@ -43,7 +43,7 @@ static func entries() -> Array:
 			known.append(id)
 	if not known.is_empty():
 		out.append({"id": "_songs", "title": "Songs", "songs": known,
-			"text": "Hold the lyre, then play the notes. Combat songs cost Muse; on the beat, half."})
+			"text": "Hold the lyre (Shift), then play the notes with the arrows. Z is the middle string: press Jump (Z or Space). Combat songs cost Muse; on the beat, half."})
 	for e in ContentDB.json("journal").get("entries", []):
 		if unlocked(String(e.get("when", "always"))):
 			out.append(e)
@@ -115,7 +115,7 @@ func _draw_songs() -> void:
 	if _entries.is_empty() or not _entries[_sel].has("songs"):
 		return
 	var songs := ContentDB.json("songs")
-	var y := PAGE.position.y + 52
+	var y := PAGE.position.y + 74
 	var f := UiKit.font()
 	for id in _entries[_sel]["songs"]:
 		var song: Dictionary = songs[id]
@@ -133,7 +133,8 @@ func _draw_note(at: Vector2, note: String) -> void:
 	var dirs := {"up": Vector2.UP, "down": Vector2.DOWN, "left": Vector2.LEFT, "right": Vector2.RIGHT}
 	_canvas.draw_circle(at, 6.0, Color(0.2, 0.17, 0.12))
 	if not dirs.has(note):
-		_canvas.draw_circle(at, 2.5, UiKit.GOLD)
+		# The middle string is played with Jump, so it shows Jump's key.
+		_canvas.draw_string(UiKit.font(), at + Vector2(-2.5, 3.5), "Z", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, UiKit.GOLD)
 		return
 	var d: Vector2 = dirs[note]
 	var side := Vector2(-d.y, d.x)
