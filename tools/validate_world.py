@@ -21,7 +21,10 @@ Movement model (one tile = 16 px, Orpheus is two tiles tall):
 Gates and pickups come from the legend:
   S = song_seal song=zeus          -> blocks until ability "song:zeus"
   k = pickup ability=sandals       -> grants "sandals"
-  g = gate needs=sandals           -> blocks until "sandals"
+  g = gate needs=sandals           -> blocks until "sandals" (an ability or a flag)
+People (content/npcs.json) grant their "grants" once reached. A guardian
+(content/enemies.json with a "defeat_flag") raises that flag once reached
+with the ability it "needs" (the Colchis Bull needs the club).
 """
 from __future__ import annotations
 
@@ -54,6 +57,9 @@ class World:
         self.legend = load_json("legend", base)
         self.movement = load_json("movement", base)
         self.themes = load_json("themes", base)
+        self.props = load_json("props", base) if (base / "props.json").exists() else {}
+        self.npcs = load_json("npcs", base) if (base / "npcs.json").exists() else {}
+        self.enemies = load_json("enemies", base) if (base / "enemies.json").exists() else {}
         self.cw, self.ch = self.world["cell"]
         self.rooms: dict[str, Room] = {}
         self.origin: dict[str, tuple[int, int]] = {}
@@ -199,11 +205,34 @@ def check_edges(w: World, rep: Report) -> None:
             for inside, outside in pairs:
                 if w.char(inside) in SOLID:
                     continue
+                # A deadly pool may run off the bottom of the screen, so it reads as
+                # deep; nobody comes out of it alive, so it needn't meet an opening.
+                if side == "bottom" and w.char(inside) == "~":
+                    continue
                 if outside not in w.grid:
                     rep.errors.append(f"{rid}: {side} edge opens onto nothing at world cell {inside}")
                 elif w.char(outside) in SOLID:
                     other = w.grid[outside][1]
                     rep.errors.append(f"{rid}: {side} edge opening at {inside} runs into a wall in {other}")
+
+
+def check_footing(w: World, rep: Report) -> None:
+    """Things that stand on the ground (braziers, Hearths, trees, people,
+    walking enemies) must have floor or a ledge right under them. Hanging
+    lanterns, icicles, bobbing pickups and flyers are exempt."""
+    flyers = {k for k, v in w.enemies.items() if isinstance(v, dict) and v.get("flies")} | {"bat"}
+    for e in w.entities:
+        kind = e["kind"]
+        spec = w.props.get(kind, {}) if isinstance(w.props.get(kind), dict) else {}
+        if kind == "player_start" or kind in flyers or kind == "pickup":
+            continue
+        if kind in w.props and (spec.get("hang") or spec.get("drip") or spec.get("bob")):
+            continue
+        if kind not in w.props and kind not in w.npcs and kind not in w.enemies:
+            continue
+        below = w.char((e["x"], e["y"] + 1))
+        if below not in SOLID and below != "=":
+            rep.errors.append(f"{e['id']}: floating, with nothing under it ({below!r})")
 
 
 def solve(w: World, rep: Report) -> None:
@@ -216,10 +245,18 @@ def solve(w: World, rep: Report) -> None:
         stands, graph, gates = w.reachable(starts, abilities)
         gained = set()
         for e in w.entities:
-            if e["kind"] == "pickup" and w.touched(e, stands):
-                ab = e["params"].get("ability", "")
-                if ab and ab not in abilities:
-                    gained.add(ab)
+            if not w.touched(e, stands):
+                continue
+            gives = []
+            if e["kind"] == "pickup":
+                gives = [e["params"].get("ability", "")]
+            elif e["kind"] in w.npcs:
+                gives = w.npcs[e["kind"]].get("grants", [])
+            elif w.enemies.get(e["kind"], {}).get("defeat_flag"):
+                spec = w.enemies[e["kind"]]
+                if spec.get("needs", "") in abilities | {""}:
+                    gives = [spec["defeat_flag"]]
+            gained |= {g for g in gives if g and g not in abilities}
         if not gained:
             break
         rounds.append(sorted(gained))
@@ -229,8 +266,10 @@ def solve(w: World, rep: Report) -> None:
 
     # Everything that matters must be reachable with the final abilities.
     for e in w.entities:
-        if e["kind"] in ("player_start", "torch", "lantern", "column", "broken_column", "olive_tree",
-                         "satyr", "bat", "snake"):
+        decor = e["kind"] in w.props and "pickup" not in w.props[e["kind"]] and \
+            e["kind"] not in ("hearth", "song_seal", "gate")
+        if decor or e["kind"] == "player_start" or \
+                (e["kind"] in w.enemies and not w.enemies[e["kind"]].get("defeat_flag")):
             continue
         need = w.needs(e)
         if need:
@@ -265,6 +304,22 @@ def solve(w: World, rep: Report) -> None:
         rooms = sorted({w.grid[s][1] for s in trapped})
         rep.errors.append(f"softlock: {len(trapped)} reachable spots cannot get back to a Hearth "
                           f"(rooms: {', '.join(rooms)}; first at world cell {trapped[0]})")
+    # One-way trips: the route doubles back, so every Hearth (where a death
+    # sends you) must lead back to where the game starts. Otherwise a song
+    # learned far away could never reach the seal it opens.
+    home = {s for s in stands if s in set(starts)}
+    can_return = set(home)
+    q = deque(home)
+    while q:
+        t = q.popleft()
+        for s in reverse.get(t, []):
+            if s not in can_return:
+                can_return.add(s)
+                q.append(s)
+    hearths = {(e["x"], e["y"]): e["id"] for e in w.entities if e["kind"] == "hearth"}
+    for xy, hid in sorted(hearths.items()):
+        if xy in stands and xy not in can_return:
+            rep.errors.append(f"{hid}: no way back to the start from this Hearth")
     rep.info.append(f"reachable stands: {len(stands)} across {len(visited_rooms)} rooms")
 
 
@@ -275,6 +330,7 @@ def validate(base: Path = CONTENT) -> Report:
     if rep.errors:
         return rep
     check_edges(w, rep)
+    check_footing(w, rep)
     solve(w, rep)
     return rep
 

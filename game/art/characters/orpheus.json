@@ -61,7 +61,19 @@
       "count": 8,
       "fps": 8,
       "loop": true
+    },
+    "crouch": {
+      "start": 40,
+      "count": 4,
+      "fps": 4,
+      "loop": true
+    },
+    "crouch_attack": {
+      "start": 44,
+      "count": 6,
+      "fps": 30,
+      "loop": false
     }
   },
-  "frames": 40
+  "frames": 50
 }

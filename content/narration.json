@@ -1,0 +1,68 @@
+{
+  "_help": "Hermes narrates as you play, in captions that don't stop the game. Each key is spoken once per game. Keys: 'room:<id>' (first time you enter), 'ability:<id>', 'flag:<id>', 'death:<n>' (your nth death), 'hearth' (first rest), plus a few the game raises itself ('bull_wakes', 'olives_back'). A line is a string (Hermes) or [speaker, text].",
+  "room:arcadia_01": [
+    "Here's how it starts. It starts in the cold.",
+    "A boy called Orpheus, a lyre with frozen strings, and a winter that won't let go.",
+    "Arrows to walk, Z to jump. You know this part."
+  ],
+  "ability:club": [
+    "A club. Not much of a hero's weapon, but it'll do. X to swing. C to dodge."
+  ],
+  "flag:met_eurydice": [
+    "That was Eurydice. Remember her. This story is mostly about her, even when she isn't in it."
+  ],
+  "hearth": [
+    "Hestia's Hearths: rest, heal, and she gives you a Word. Write it down. Browsers forget. Words don't."
+  ],
+  "room:arcadia_02": [
+    "The old temple. Someone sealed its door with a song, a long time ago."
+  ],
+  "room:arcadia_03": [
+    "Shepherd's Drop. Hold Down and press Jump to drop through a ledge."
+  ],
+  "room:arcadia_04": [
+    "The brook froze in a night. The fish are still in it, waiting for spring like everyone else.",
+    "Where the ice has broken, the water underneath is black and very deep. Jump it."
+  ],
+  "room:arcadia_05": [
+    "Hermit's Climb. Zeus keeps his altar at the top. Gods do like a view."
+  ],
+  "flag:met_zeus": [
+    "Note that Zeus didn't name a price for the lyre. Gods never do, up front."
+  ],
+  "room:arcadia_07": [
+    "The Olive Caves. Warmer down here. Olives buy things up there: favours, mostly."
+  ],
+  "room:arcadia_10": [
+    "Scorpions. Low, armoured and mean. Hold Down to crouch, then swing to strike low."
+  ],
+  "room:arcadia_11": [
+    "Under the temple. No one has been down here since the last time the seasons broke."
+  ],
+  "ability:song:hymn": [
+    "Calliope's Hymn: his mother's song. It heals, for a little Muse. On the beat, it costs half.",
+    "Hold the lyre and play Left, Right, then the middle string (that's Jump), then Up."
+  ],
+  "room:arcadia_08": [
+    "The Bull's Pen. Quiet, isn't it?"
+  ],
+  "bull_wakes": [
+    "Bronze, fire, and not a note of music in it. When it scrapes the ground, it charges on the next beat."
+  ],
+  "flag:beat_bull": [
+    "The Colchis Bull, beaten by a boy with a club. Somebody down below is going to hear about this."
+  ],
+  "room:arcadia_09": [
+    "The road east. Somebody's waiting at the end of it."
+  ],
+  "death:1": [
+    "Ah. Everyone dies the first time.",
+    "Half your olives stayed where you fell, with something that looks a lot like you. Go and get them back."
+  ],
+  "death:4": [
+    "You're getting good at that. If the beat feels unfair, try Rhythm assist in the pause menu."
+  ],
+  "olives_back": [
+    "There. Debts settled."
+  ]
+}

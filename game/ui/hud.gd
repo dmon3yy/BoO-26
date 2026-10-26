@@ -5,6 +5,8 @@ extends CanvasLayer
 ##   top left    health (each pip is 2 HP) and the Muse meter
 ##   top right   the beat pulse, and how your last timed input was graded
 ##   above him   the notes you're playing while holding the lyre
+##   under Muse  your olives
+##   bottom      a guardian's health, once it wakes
 ##
 ## It only listens to Events and reads the player, so nothing in combat
 ## knows the HUD exists.
@@ -25,6 +27,9 @@ var _grade_t := 0.0
 var _song_label: Label
 var _song_t := 0.0
 var _canvas: Control
+var _olives := 0
+var _olive_tex: Texture2D
+var _boss_name: Label
 
 
 func _ready() -> void:
@@ -34,7 +39,7 @@ func _ready() -> void:
 	_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.draw.connect(_draw_hud)
 	add_child(_canvas)
-	_song_label = UiKit.label("", Vector2(0, 40), UiKit.GOLD)
+	_song_label = UiKit.label("", Vector2(0, 64), UiKit.GOLD)
 	_song_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_song_label.size.x = 480
 	add_child(_song_label)
@@ -42,6 +47,18 @@ func _ready() -> void:
 	Events.muse_changed.connect(func(v, m): _muse = v; _max_muse = m)
 	Events.beat_graded.connect(_on_graded)
 	Events.song_played.connect(_on_song)
+	Events.olives_changed.connect(func(n): _olives = n)
+	_olives = GameState.olives
+	_olive_tex = ContentDB.texture("res://game/art/props/olive.png")
+	_boss_name = UiKit.label("", Vector2(140, 246), UiKit.INK)
+	_boss_name.visible = false
+	add_child(_boss_name)
+
+
+## A short message in the middle of the screen ("Recovered 12 olives").
+func flash_text(text: String, seconds: float = 2.2) -> void:
+	_song_label.text = text
+	_song_t = seconds
 
 
 func _on_graded(grade: int, what: String) -> void:
@@ -84,6 +101,21 @@ func _draw_hud() -> void:
 	var k := _muse / maxf(_max_muse, 1.0)
 	c.draw_rect(Rect2(bar.position, Vector2(bar.size.x * k, bar.size.y)), UiKit.GOLD)
 	c.draw_string(UiKit.font(), Vector2(70, 25), "MUSE", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, UiKit.DIM)
+	# Olives.
+	if _olive_tex:
+		c.draw_texture(_olive_tex, Vector2(6, 27))
+	c.draw_string(UiKit.font(), Vector2(6 + (_olive_tex.get_width() if _olive_tex else 0) + 3, 36), str(_olives),
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 8, UiKit.INK)
+	# A guardian's health.
+	var boss := get_tree().get_first_node_in_group(&"boss")
+	_boss_name.visible = boss != null and boss.awake()
+	if _boss_name.visible:
+		_boss_name.text = boss.display_name()
+		var hb := Rect2(140, 256, 200, 4)
+		c.draw_rect(hb.grow(1), Color(0, 0, 0, 0.7))
+		c.draw_rect(hb, Color(0.25, 0.12, 0.08))
+		c.draw_rect(Rect2(hb.position, Vector2(hb.size.x * clampf(boss.hp / float(boss.max_hp), 0.0, 1.0), 4)),
+			Color(0.9, 0.55, 0.2))
 
 	# The beat: a dot that swells on every beat, ringed by your last grade.
 	var dot := Vector2(466, 12)
@@ -110,7 +142,8 @@ func _draw_hud() -> void:
 func _draw_note(c: Control, at: Vector2, note: String, col: Color) -> void:
 	var dirs := {"up": Vector2.UP, "down": Vector2.DOWN, "left": Vector2.LEFT, "right": Vector2.RIGHT}
 	if not dirs.has(note):
-		c.draw_circle(at, 2.5, col)
+		# The middle string is played with Jump, so it shows Jump's key.
+		c.draw_string(UiKit.font(), at + Vector2(-2.5, 3.5), "Z", HORIZONTAL_ALIGNMENT_LEFT, -1, 8, col)
 		return
 	var d: Vector2 = dirs[note]
 	var side := Vector2(-d.y, d.x)

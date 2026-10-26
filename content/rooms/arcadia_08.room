@@ -1,41 +1,44 @@
-; A trampled pen where the Colchis Bull will stand guard. A climb leads back up to the Hearth.
+; The Bull's Pen. A bronze bull stands guard over the gate east. The shaft above climbs back to the Hearth.
 id = arcadia_08
 theme = arcadia_cave
 name = The Bull's Pen
 
+[legend]
+g = gate needs=beat_bull
+
 [map]
-####################........##
-####################....===.##
-####################........##
-####################........##
-####################...===..##
-##..........................##
-##..................n.......##
-##.................===......##
-##..........................##
-............................##
-...............===..........##
-............................##
-....T.......Y.......s.......##
+########################...###
+########################===###
+#####.....ii........i.......##
+#####.......................##
+#####.................=====.##
+...i........................##
+...........o........o.......##
+.........====.....=====.....##
+..T.........................##
+#####.......................##
+#####.====.....====...........
+#####.........................
+#####...T..........B........g.
 ##############################
 ##############################
 ##############################
 ##############################
 
 [back]
-....................bbbbbbbb..
-....................bbbbbbbb..
-....................bbbbbbbb..
-....................bbbbbbbb..
-....................bbbbbbbb..
-..bbbbbbbbbbbbbbbbbbbbbbbbbb..
-..bbbbbbbbbbbbbbbbbbbbbbbbbb..
-..bbbbbbbbbbbbbbbbbbbbbbbbbb..
-..bbbbbbbbbbbbbbbbbbbbbbbbbb..
+........................bbb...
+........................bbb...
+.....bbbbbbbbbbbbbbbbbbbbbbb..
+.....bbbbbbbbbbbbbbbbbbbbbbb..
+.....bbbbbbbbbbbbbbbbbbbbbbb..
 bbbbbbbbbbbbbbbbbbbbbbbbbbbb..
 bbbbbbbbbbbbbbbbbbbbbbbbbbbb..
 bbbbbbbbbbbbbbbbbbbbbbbbbbbb..
 bbbbbbbbbbbbbbbbbbbbbbbbbbbb..
+.....bbbbbbbbbbbbbbbbbbbbbbb..
+.....bbbbbbbbbbbbbbbbbbbbbbb..
+.....bbbbbbbbbbbbbbbbbbbbbbb..
+.....bbbbbbbbbbbbbbbbbbbbbbb..
 ..............................
 ..............................
 ..............................

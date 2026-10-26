@@ -1,0 +1,55 @@
+{
+  "frame_size": [
+    128,
+    88
+  ],
+  "origin": [
+    60,
+    85
+  ],
+  "anims": {
+    "idle": {
+      "start": 0,
+      "count": 8,
+      "fps": 6,
+      "loop": true
+    },
+    "walk": {
+      "start": 8,
+      "count": 8,
+      "fps": 8,
+      "loop": true
+    },
+    "paw": {
+      "start": 16,
+      "count": 4,
+      "fps": 10,
+      "loop": true
+    },
+    "charge": {
+      "start": 20,
+      "count": 6,
+      "fps": 16,
+      "loop": true
+    },
+    "dazed": {
+      "start": 26,
+      "count": 6,
+      "fps": 6,
+      "loop": true
+    },
+    "inhale": {
+      "start": 32,
+      "count": 4,
+      "fps": 6,
+      "loop": true
+    },
+    "flame": {
+      "start": 36,
+      "count": 4,
+      "fps": 12,
+      "loop": true
+    }
+  },
+  "frames": 40
+}

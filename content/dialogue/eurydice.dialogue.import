@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://ckatg1pmknqnh"
+path="res://.godot/imported/eurydice.dialogue-5af3b472dfcf6517a2cae1339502e0c0.tres"
+
+[deps]
+
+source_file="res://content/dialogue/eurydice.dialogue"
+dest_files=["res://.godot/imported/eurydice.dialogue-5af3b472dfcf6517a2cae1339502e0c0.tres"]
+
+[params]
+
+defaults=true

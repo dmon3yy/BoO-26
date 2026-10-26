@@ -1,0 +1,514 @@
+{
+  "_help": [
+    "A quadruped on the same rig system: the body hangs from the hip, the head and four legs hang from the body.",
+    "Back legs (_b) are drawn behind and shaded; 'charge' gallops, 'paw' scrapes a front hoof on the beat before a charge.",
+    "Drawn at full size (frame 128x88): the guardian is about twice Orpheus's height at the horns."
+  ],
+  "sprite": "colchis_bull",
+  "palette": "colchis_bull",
+  "frame": [
+    128,
+    88
+  ],
+  "hip": [
+    60,
+    49
+  ],
+  "parts": {
+    "tail": {
+      "grid": "tail",
+      "pivot": [
+        2,
+        0
+      ],
+      "parent": "body",
+      "attach": [
+        2,
+        9
+      ]
+    },
+    "thigh_bb": {
+      "grid": "thigh",
+      "pivot": [
+        6,
+        2
+      ],
+      "parent": "body",
+      "attach": [
+        12,
+        20
+      ],
+      "shade": 0.65
+    },
+    "shin_bb": {
+      "grid": "shin",
+      "pivot": [
+        5,
+        0
+      ],
+      "parent": "thigh_bb",
+      "attach": [
+        6,
+        14
+      ],
+      "shade": 0.65
+    },
+    "thigh_fb": {
+      "grid": "thigh",
+      "pivot": [
+        6,
+        2
+      ],
+      "parent": "body",
+      "attach": [
+        46,
+        20
+      ],
+      "shade": 0.65
+    },
+    "shin_fb": {
+      "grid": "shin",
+      "pivot": [
+        5,
+        0
+      ],
+      "parent": "thigh_fb",
+      "attach": [
+        6,
+        14
+      ],
+      "shade": 0.65
+    },
+    "body": {
+      "grid": "body",
+      "pivot": [
+        30,
+        12
+      ],
+      "parent": "hip"
+    },
+    "head": {
+      "grid": "head",
+      "pivot": [
+        5,
+        20
+      ],
+      "parent": "body",
+      "attach": [
+        52,
+        9
+      ]
+    },
+    "thigh_bf": {
+      "grid": "thigh",
+      "pivot": [
+        6,
+        2
+      ],
+      "parent": "body",
+      "attach": [
+        16,
+        21
+      ]
+    },
+    "shin_bf": {
+      "grid": "shin",
+      "pivot": [
+        5,
+        0
+      ],
+      "parent": "thigh_bf",
+      "attach": [
+        6,
+        14
+      ]
+    },
+    "thigh_ff": {
+      "grid": "thigh",
+      "pivot": [
+        6,
+        2
+      ],
+      "parent": "body",
+      "attach": [
+        50,
+        21
+      ]
+    },
+    "shin_ff": {
+      "grid": "shin",
+      "pivot": [
+        5,
+        0
+      ],
+      "parent": "thigh_ff",
+      "attach": [
+        6,
+        14
+      ]
+    }
+  },
+  "draw_order": [
+    "tail",
+    "thigh_bb",
+    "shin_bb",
+    "thigh_fb",
+    "shin_fb",
+    "body",
+    "head",
+    "thigh_bf",
+    "shin_bf",
+    "thigh_ff",
+    "shin_ff"
+  ],
+  "anims": {
+    "idle": {
+      "frames": 8,
+      "fps": 6,
+      "hip_dy": {
+        "mean": 0
+      },
+      "body": {
+        "mean": 0,
+        "amp": 1
+      },
+      "head": {
+        "mean": 4,
+        "amp": 4,
+        "phase": 0.2
+      },
+      "tail": {
+        "mean": 40,
+        "amp": 10
+      },
+      "thigh_ff": {
+        "mean": 0
+      },
+      "shin_ff": {
+        "mean": 0
+      },
+      "thigh_fb": {
+        "mean": 4
+      },
+      "shin_fb": {
+        "mean": 0
+      },
+      "thigh_bf": {
+        "mean": -4
+      },
+      "shin_bf": {
+        "mean": 2
+      },
+      "thigh_bb": {
+        "mean": 3
+      },
+      "shin_bb": {
+        "mean": 0
+      }
+    },
+    "walk": {
+      "frames": 8,
+      "fps": 8,
+      "hip_dy": {
+        "mean": 0,
+        "amp": 0.6,
+        "harmonic": 2
+      },
+      "body": {
+        "mean": 0,
+        "amp": 1.5,
+        "harmonic": 2
+      },
+      "head": {
+        "mean": 6,
+        "amp": 4,
+        "harmonic": 2
+      },
+      "tail": {
+        "mean": 40,
+        "amp": 12
+      },
+      "thigh_ff": {
+        "mean": 0,
+        "amp": 18
+      },
+      "shin_ff": {
+        "mean": 8,
+        "amp": 10,
+        "phase": -0.25,
+        "min": 0
+      },
+      "thigh_fb": {
+        "mean": 0,
+        "amp": 18,
+        "phase": 0.5
+      },
+      "shin_fb": {
+        "mean": 8,
+        "amp": 10,
+        "phase": 0.25,
+        "min": 0
+      },
+      "thigh_bf": {
+        "mean": 0,
+        "amp": 18,
+        "phase": 0.5
+      },
+      "shin_bf": {
+        "mean": 8,
+        "amp": 10,
+        "phase": 0.25,
+        "min": 0
+      },
+      "thigh_bb": {
+        "mean": 0,
+        "amp": 18
+      },
+      "shin_bb": {
+        "mean": 8,
+        "amp": 10,
+        "phase": -0.25,
+        "min": 0
+      }
+    },
+    "paw": {
+      "frames": 4,
+      "fps": 10,
+      "hip_dy": {
+        "mean": 1
+      },
+      "body": {
+        "mean": 4
+      },
+      "head": {
+        "mean": 24,
+        "amp": 3
+      },
+      "tail": {
+        "mean": 70,
+        "amp": 15
+      },
+      "thigh_ff": {
+        "mean": -20,
+        "amp": 25
+      },
+      "shin_ff": {
+        "mean": 30,
+        "amp": 25,
+        "phase": 0.25
+      },
+      "thigh_fb": {
+        "mean": 10
+      },
+      "shin_fb": {
+        "mean": 0
+      },
+      "thigh_bf": {
+        "mean": -10
+      },
+      "shin_bf": {
+        "mean": 5
+      },
+      "thigh_bb": {
+        "mean": -8
+      },
+      "shin_bb": {
+        "mean": 5
+      }
+    },
+    "charge": {
+      "frames": 6,
+      "fps": 16,
+      "hip_dy": {
+        "mean": -1,
+        "amp": 1.5,
+        "harmonic": 2
+      },
+      "body": {
+        "mean": 5,
+        "amp": 2
+      },
+      "head": {
+        "mean": 30,
+        "amp": 3,
+        "harmonic": 2
+      },
+      "tail": {
+        "mean": 85,
+        "amp": 8,
+        "harmonic": 2
+      },
+      "thigh_ff": {
+        "mean": -5,
+        "amp": 40
+      },
+      "shin_ff": {
+        "mean": 20,
+        "amp": 25,
+        "phase": -0.25,
+        "min": 0
+      },
+      "thigh_fb": {
+        "mean": -5,
+        "amp": 40,
+        "phase": 0.15
+      },
+      "shin_fb": {
+        "mean": 20,
+        "amp": 25,
+        "phase": -0.1,
+        "min": 0
+      },
+      "thigh_bf": {
+        "mean": 5,
+        "amp": 40,
+        "phase": 0.5
+      },
+      "shin_bf": {
+        "mean": 15,
+        "amp": 20,
+        "phase": 0.25,
+        "min": 0
+      },
+      "thigh_bb": {
+        "mean": 5,
+        "amp": 40,
+        "phase": 0.65
+      },
+      "shin_bb": {
+        "mean": 15,
+        "amp": 20,
+        "phase": 0.4,
+        "min": 0
+      }
+    },
+    "dazed": {
+      "frames": 6,
+      "fps": 6,
+      "hip_dy": {
+        "mean": 3
+      },
+      "body": {
+        "mean": 4,
+        "amp": 3
+      },
+      "head": {
+        "mean": 20,
+        "amp": 10
+      },
+      "tail": {
+        "mean": 10,
+        "amp": 5
+      },
+      "thigh_ff": {
+        "mean": -25
+      },
+      "shin_ff": {
+        "mean": 40
+      },
+      "thigh_fb": {
+        "mean": -15
+      },
+      "shin_fb": {
+        "mean": 35
+      },
+      "thigh_bf": {
+        "mean": 20
+      },
+      "shin_bf": {
+        "mean": -10
+      },
+      "thigh_bb": {
+        "mean": 25
+      },
+      "shin_bb": {
+        "mean": -15
+      }
+    },
+    "inhale": {
+      "frames": 4,
+      "fps": 6,
+      "hip_dy": {
+        "mean": 0
+      },
+      "body": {
+        "mean": -4
+      },
+      "head": {
+        "mean": -22,
+        "amp": 4
+      },
+      "tail": {
+        "mean": 60,
+        "amp": 10
+      },
+      "thigh_ff": {
+        "mean": -10
+      },
+      "shin_ff": {
+        "mean": 5
+      },
+      "thigh_fb": {
+        "mean": -5
+      },
+      "shin_fb": {
+        "mean": 5
+      },
+      "thigh_bf": {
+        "mean": 5
+      },
+      "shin_bf": {
+        "mean": 0
+      },
+      "thigh_bb": {
+        "mean": 8
+      },
+      "shin_bb": {
+        "mean": 0
+      }
+    },
+    "flame": {
+      "frames": 4,
+      "fps": 12,
+      "hip_dy": {
+        "mean": 1
+      },
+      "body": {
+        "mean": 2
+      },
+      "head": {
+        "mean": 10,
+        "amp": 3,
+        "harmonic": 2
+      },
+      "tail": {
+        "mean": 80,
+        "amp": 6
+      },
+      "thigh_ff": {
+        "mean": -15
+      },
+      "shin_ff": {
+        "mean": 20
+      },
+      "thigh_fb": {
+        "mean": -10
+      },
+      "shin_fb": {
+        "mean": 15
+      },
+      "thigh_bf": {
+        "mean": 10
+      },
+      "shin_bf": {
+        "mean": 0
+      },
+      "thigh_bb": {
+        "mean": 12
+      },
+      "shin_bb": {
+        "mean": 0
+      }
+    }
+  }
+}

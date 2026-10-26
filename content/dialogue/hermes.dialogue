@@ -1,0 +1,18 @@
+~ start
+
+if GameState.get_flag("met_hermes")
+	=> again
+Hermes: Well, look at you. Bull-breaker. Lyre-player. Still thin as a reed.
+Hermes: Hermes. Messenger, guide, and the one telling this story. You've heard me all along; you just couldn't see me.
+Orpheus: You talk a lot.
+Hermes: Occupational hazard.
+Hermes: Past here is Attica, and Athens, and a goddess with a shield and opinions. That's the next verse.
+Hermes: The road isn't built yet. Not by the people making this, anyway.
+Hermes: So rest at the Hearth, and write down your Word. When the road's ready, we'll pick this up right where you left off.
+do GameState.set_flag("met_hermes")
+=> END
+
+~ again
+
+Hermes: Still here? The road's still being built. Your Word will keep.
+=> END

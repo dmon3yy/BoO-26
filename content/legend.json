@@ -26,6 +26,17 @@
     "S": "song_seal",
     "s": "satyr",
     "v": "bat",
-    "n": "snake"
+    "n": "snake",
+    "k": "pickup",
+    "g": "gate",
+    "Z": "zeus",
+    "E": "eurydice",
+    "M": "hermes",
+    "B": "colchis_bull",
+    "x": "scorpion",
+    "a": "altar",
+    "p": "pine",
+    "i": "stalactites",
+    "r": "signpost"
   }
 }

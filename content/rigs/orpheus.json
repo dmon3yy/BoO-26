@@ -24,7 +24,7 @@
     "head": {"grid": "head", "pivot": [5, 9], "parent": "torso", "attach": [5, 0]},
     "uarm_f": {"grid": "uarm", "pivot": [2, 1], "parent": "torso", "attach": [6, 2]},
     "farm_f": {"grid": "farm", "pivot": [1, 0], "parent": "uarm_f", "attach": [2, 6]},
-    "club": {"grid": "club", "pivot": [1, 0], "parent": "farm_f", "attach": [1, 6], "only": ["attack"]},
+    "club": {"grid": "club", "pivot": [1, 0], "parent": "farm_f", "attach": [1, 6], "only": ["attack", "crouch_attack"]},
     "lyre_held": {"grid": "lyre", "pivot": [3, 0], "parent": "torso", "attach": [8, 3], "only": ["play"]}
   },
   "draw_order": [
@@ -201,6 +201,43 @@
       "farm_f": {"mean": -85, "amp": 12, "harmonic": 2},
       "cape": {"mean": 7, "amp": 4, "phase": 0.2},
       "lyre_held": {"mean": 0, "amp": 2}
+    },
+    "crouch": {
+      "frames": 4,
+      "fps": 4,
+      "hip_dy": {"mean": 8},
+      "thigh_f": {"mean": -80},
+      "shin_f": {"mean": 100},
+      "thigh_b": {"mean": -20},
+      "shin_b": {"mean": 115},
+      "torso_dy": {"mean": 0.5, "amp": 0.5, "phase": 0.25},
+      "torso": {"mean": 14},
+      "head": {"mean": -12, "amp": 1},
+      "uarm_f": {"mean": -20, "amp": 2},
+      "farm_f": {"mean": -40},
+      "uarm_b": {"mean": 10},
+      "farm_b": {"mean": -30},
+      "cape": {"mean": 22, "amp": 3},
+      "lyre": {"mean": -30}
+    },
+    "crouch_attack": {
+      "frames": 6,
+      "fps": 30,
+      "loop": false,
+      "hip_dy": {"mean": 8},
+      "thigh_f": {"mean": -80},
+      "shin_f": {"mean": 100},
+      "thigh_b": {"mean": -20},
+      "shin_b": {"mean": 115},
+      "torso": {"mean": 18, "amp": -8, "harmonic": 0.5, "phase": 0.25},
+      "head": {"mean": -12},
+      "uarm_f": {"mean": 222, "amp": -80, "harmonic": 0.5, "phase": 0.25},
+      "farm_f": {"mean": -5, "amp": 5, "harmonic": 0.5, "phase": 0.25},
+      "club": {"mean": -5, "amp": 10, "harmonic": 0.5, "phase": 0.25},
+      "uarm_b": {"mean": 20},
+      "farm_b": {"mean": -30},
+      "cape": {"mean": 24, "amp": -6, "harmonic": 0.5, "phase": 0.25},
+      "lyre": {"mean": -30}
     }
   }
 }

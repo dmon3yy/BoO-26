@@ -1,0 +1,16 @@
+[remap]
+
+importer="dialogue_manager"
+importer_version=18
+type="Resource"
+uid="uid://c7mf4idt70n3r"
+path="res://.godot/imported/hermes.dialogue-2c2b41a8eea76b68f61f645af8971315.tres"
+
+[deps]
+
+source_file="res://content/dialogue/hermes.dialogue"
+dest_files=["res://.godot/imported/hermes.dialogue-2c2b41a8eea76b68f61f645af8971315.tres"]
+
+[params]
+
+defaults=true

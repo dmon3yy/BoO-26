@@ -8,3 +8,6 @@ var rect: Rect2                 # world-space rectangle
 var player_start := Vector2.ZERO      # world space
 var hearths: Array[Vector2] = []      # world space
 var seals: Dictionary = {}            # entity id -> {"song", "at" (world), "nodes"}
+var pickups: Dictionary = {}          # entity id -> {"kind", "params", "at" (world), "nodes"}
+var gates: Dictionary = {}            # entity id -> {"needs", "nodes"}
+var npcs: Array[Npc] = []

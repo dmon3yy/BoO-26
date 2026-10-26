@@ -1,0 +1,54 @@
+{
+  "_help": "People Orpheus can talk to. 'rig' is the sprite sheet, 'dialogue' the file in content/dialogue/. 'titles' picks a later conversation once a need is met (checked in order). 'grants' tells the world validator what a conversation gives. 'light' gives a god their glow.",
+  "zeus": {
+    "rig": "zeus",
+    "dialogue": "zeus",
+    "grants": [
+      "lyre",
+      "song:zeus"
+    ],
+    "facing": -1,
+    "light": {
+      "offset": [
+        0,
+        -44
+      ],
+      "color": [
+        0.78,
+        0.86,
+        1.0
+      ],
+      "energy": 1.5,
+      "scale": 2.6,
+      "flicker": 0.04,
+      "shadow": true,
+      "halo": 34
+    }
+  },
+  "eurydice": {
+    "rig": "eurydice",
+    "dialogue": "eurydice",
+    "facing": -1
+  },
+  "hermes": {
+    "rig": "hermes",
+    "dialogue": "hermes",
+    "facing": -1,
+    "light": {
+      "offset": [
+        0,
+        -30
+      ],
+      "color": [
+        0.7,
+        0.95,
+        1.0
+      ],
+      "energy": 0.8,
+      "scale": 1.4,
+      "flicker": 0.05,
+      "shadow": false,
+      "halo": 18
+    }
+  }
+}

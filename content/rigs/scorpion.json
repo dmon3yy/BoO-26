@@ -1,0 +1,65 @@
+{
+  "_help": [
+    "Low enough that a standing swing goes over it. The tail is a chain of segments: 'raise' curls it up, 'sting' snaps it forward."
+  ],
+  "sprite": "scorpion",
+  "palette": "scorpion",
+  "frame": [36, 26],
+  "hip": [16, 20],
+  "parts": {
+    "body": {"grid": "body", "pivot": [7, 4], "parent": "hip"},
+    "seg1": {"grid": "seg", "pivot": [2, 3], "parent": "body", "attach": [1, 2]},
+    "seg2": {"grid": "seg", "pivot": [2, 3], "parent": "seg1", "attach": [2, 0]},
+    "seg3": {"grid": "seg", "pivot": [2, 3], "parent": "seg2", "attach": [2, 0]},
+    "sting": {"grid": "sting", "pivot": [1, 4], "parent": "seg3", "attach": [2, 0]},
+    "claw": {"grid": "claw", "pivot": [1, 2], "parent": "body", "attach": [13, 3]}
+  },
+  "draw_order": ["seg1", "seg2", "seg3", "sting", "body", "claw"],
+  "anims": {
+    "idle": {
+      "frames": 4,
+      "fps": 4,
+      "hip_dy": {"mean": 0},
+      "body": {"mean": 0},
+      "seg1": {"mean": -35, "amp": 4},
+      "seg2": {"mean": 30, "amp": 4, "phase": 0.2},
+      "seg3": {"mean": 35, "amp": 4, "phase": 0.4},
+      "sting": {"mean": 45},
+      "claw": {"mean": -5, "amp": 5}
+    },
+    "walk": {
+      "frames": 4,
+      "fps": 10,
+      "hip_dy": {"mean": 0, "amp": 0.5, "harmonic": 2},
+      "body": {"mean": 0},
+      "seg1": {"mean": -35, "amp": 6},
+      "seg2": {"mean": 30, "amp": 6, "phase": 0.2},
+      "seg3": {"mean": 35, "amp": 6, "phase": 0.4},
+      "sting": {"mean": 45},
+      "claw": {"mean": -5, "amp": 8}
+    },
+    "raise": {
+      "frames": 2,
+      "fps": 8,
+      "hip_dy": {"mean": 0},
+      "body": {"mean": 4},
+      "seg1": {"mean": -45},
+      "seg2": {"mean": 5},
+      "seg3": {"mean": 15},
+      "sting": {"mean": 25},
+      "claw": {"mean": -25}
+    },
+    "sting": {
+      "frames": 3,
+      "fps": 14,
+      "loop": false,
+      "hip_dy": {"mean": 0},
+      "body": {"mean": -4},
+      "seg1": {"mean": -20},
+      "seg2": {"mean": 55},
+      "seg3": {"mean": 60},
+      "sting": {"mean": 70},
+      "claw": {"mean": 5}
+    }
+  }
+}

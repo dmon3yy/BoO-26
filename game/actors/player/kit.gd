@@ -24,6 +24,7 @@ var notes: Array = []             # [{"note": String, "on_beat": bool}], newest 
 
 var _t := 0.0                     # seconds in the current state
 var _on_beat := false             # the current swing or parry was on the beat
+var low := false                  # the current swing is a crouch strike
 var _hit := {}                    # enemies this swing already hit
 var _invulnerable := 0.0
 var _cooldown := {"dodge": 0.0, "parry": 0.0}
@@ -90,7 +91,7 @@ func override_velocity(v: Vector2) -> Vector2:
 
 func anim_override() -> String:
 	match state:
-		"attack": return "attack"
+		"attack": return "crouch_attack" if low else "attack"
 		"dodge": return "dodge"
 		"parry": return "parry"
 		"hurt": return "hurt"
@@ -153,6 +154,7 @@ func _start(what: StringName) -> void:
 	_t = 0.0
 	match what:
 		&"attack":
+			low = player.crouching
 			_on_beat = _grade("swing")
 			_hit.clear()
 			Sfx.hit("club_swing", -6.0, randf_range(0.95, 1.08))
@@ -185,8 +187,10 @@ func _grade(what: String) -> bool:
 
 # --- the club ------------------------------------------------------------------
 
+## Where the club can hit right now: chest height, or along the floor for a
+## crouch strike (the only way to reach a scorpion).
 func club_box() -> Rect2:
-	var club: Dictionary = c["club"]
+	var club: Dictionary = c["club_low"] if low else c["club"]
 	var size := Vector2(club["reach"][0], club["reach"][1])
 	var centre := player.global_position + Vector2(float(club["offset"][0]) * player.facing, float(club["offset"][1]))
 	return Rect2(centre - size * 0.5, size)

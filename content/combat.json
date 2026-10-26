@@ -3,12 +3,29 @@
   "club": {
     "damage": 2,
     "startup": 0.06,
-    "active": 0.10,
+    "active": 0.1,
     "recovery": 0.14,
-    "reach": [24, 20],
-    "offset": [16, -16],
+    "reach": [
+      24,
+      18
+    ],
+    "offset": [
+      16,
+      -18
+    ],
     "knockback": 150,
     "hitstop": 0.05
+  },
+  "club_low": {
+    "_help": "The crouch strike (hold Down, then Club): the same swing, low along the floor.",
+    "reach": [
+      26,
+      12
+    ],
+    "offset": [
+      16,
+      -6
+    ]
   },
   "dodge": {
     "speed": 250,
@@ -25,7 +42,10 @@
   "hurt": {
     "stun": 0.3,
     "invulnerable": 1.0,
-    "knockback": [150, -140],
+    "knockback": [
+      150,
+      -140
+    ],
     "hitstop": 0.07
   },
   "on_beat": {

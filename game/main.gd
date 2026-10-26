@@ -1,10 +1,13 @@
 extends Node2D
-## Entry point. Boots straight into the world, continuing from the last
-## Hearth if there's a save; a title screen arrives in M3.
+## Entry point: the title screen, then the world.
 ##
 ## Environment switches (used by tools and CI, ignored otherwise):
-##   BOO_START_ROOM  start in a specific room
-##   BOO_CAPTURE     save review frames (see game/spikes/capture.gd)
+##   BOO_START_ROOM  skip the title and start in a specific room
+##   BOO_CAPTURE     save review frames (see game/spikes/capture.gd); skips the title
+##   BOO_STATE       "full" gives Orpheus his whole early kit (for captures and testing)
+##   BOO_TITLE       show the title screen even while capturing
+##   BOO_OLIVES      start with this many olives
+##   BOO_DROP        "x,y": olives (half of BOO_OLIVES) already lie there
 
 const WorldManager := preload("res://game/world/world_manager.gd")
 const Capture := preload("res://game/spikes/capture.gd")
@@ -21,24 +24,45 @@ func _ready() -> void:
 	if _wants_beat_lab():
 		get_tree().change_scene_to_file.call_deferred("res://game/spikes/beat_lab.tscn")
 		return
+	var start := OS.get_environment("BOO_START_ROOM")
+	if (start != "" or OS.get_environment("BOO_CAPTURE") != "") and OS.get_environment("BOO_TITLE") == "":
+		if OS.get_environment("BOO_STATE") == "full":
+			for a in ["lyre", "club", "song:zeus", "song:hymn", "song:charm"]:
+				GameState.grant_ability(StringName(a))
+		GameState.olives = int(OS.get_environment("BOO_OLIVES"))
+		var drop := OS.get_environment("BOO_DROP").split(",")
+		if drop.size() == 2:
+			GameState.drop_olives_on_death(start, Vector2(float(drop[0]), float(drop[1])))
+		_start_world(start if start != "" else GameState.room_id, false)
+		if capture:
+			capture.attach.call_deferred(world.player)
+		if OS.get_environment("BOO_DIALOGUE") != "":
+			_open_dialogue.call_deferred(OS.get_environment("BOO_DIALOGUE"))
+		return
+	var title := TitleScreen.new()
+	add_child(title)
+	title.chosen.connect(func(how: String):
+		title.queue_free()
+		_start_world(GameState.room_id, how != "new"))
+
+
+## Build the world. `at_hearth` wakes Orpheus at his last Hearth (Continue,
+## or a Word); otherwise he starts where the room says.
+func _start_world(room_id: String, at_hearth: bool) -> void:
 	world = WorldManager.new()
 	world.name = "World"
 	add_child(world)
-	var start := OS.get_environment("BOO_START_ROOM")
-	if start == "" and OS.get_environment("BOO_CAPTURE") == "" and Save.load_game(0) == OK:
-		# Continue: wake at the last Hearth.
+	if at_hearth and GameState.hearth_id != "":
 		var spawn: Array = world.respawn_point()
 		world.start(spawn[0])
 		world.place_player(spawn[0], spawn[1])
 	else:
-		world.start(start if start != "" else GameState.room_id)
-	if capture:
-		capture.attach.call_deferred(world.player)
-	if OS.get_environment("BOO_DIALOGUE") != "":
-		_open_dialogue.call_deferred(OS.get_environment("BOO_DIALOGUE"))
+		world.start(room_id)
 
 
 func _open_dialogue(id: String) -> void:
+	if world == null:
+		return
 	var box := DialogueBox.new()
 	add_child(box)
 	world.player.frozen = true
@@ -56,6 +80,8 @@ func _wants_beat_lab() -> bool:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if world == null:
+		return
 	if event.is_action_pressed(&"debug_dialogue"):
 		_open_dialogue("zeus")
 		return

@@ -19,6 +19,8 @@ var facing := 1
 var anim := "idle"
 var frozen := false
 var kit: OrpheusKit
+## Holding Down on the ground: he ducks (a smaller target) and swings low.
+var crouching := false
 
 ## Optional stand-in for the keyboard/gamepad, used by replay tests and the
 ## screenshot tool. Must provide axis() -> float, held(action) and pressed(action).
@@ -101,8 +103,10 @@ static func step_motion(v: Vector2, input_x: float, on_floor: bool, jump_held: b
 func _physics_process(delta: float) -> void:
 	if frozen:
 		return
+	crouching = is_on_floor() and _held(&"down") and \
+		(kit.state == "free" or (kit.state == "attack" and kit.low))
 	kit.tick(delta)
-	var x := 0.0 if kit.movement_locked() else _axis()
+	var x := 0.0 if (kit.movement_locked() or crouching) else _axis()
 	var on_floor := is_on_floor()
 	if on_floor:
 		_coyote = float(move["coyote_time"])
@@ -199,7 +203,9 @@ func _dust() -> void:
 func _animate(delta: float, x: float) -> void:
 	var want := kit.anim_override()     # attacking, dodging, parrying, playing...
 	if want == "":
-		if not is_on_floor():
+		if crouching:
+			want = "crouch"
+		elif not is_on_floor():
 			want = "jump" if velocity.y < 0.0 else "fall"
 		elif absf(velocity.x) > 8.0:
 			want = "run"
@@ -237,6 +243,8 @@ func input_x() -> float:
 
 ## The rectangle enemies and venom have to touch to hurt him.
 func hurtbox() -> Rect2:
+	if crouching:
+		return Rect2(global_position + Vector2(-6, -18), Vector2(12, 18))
 	return Rect2(global_position + Vector2(-5, -30), Vector2(10, 30))
 
 
