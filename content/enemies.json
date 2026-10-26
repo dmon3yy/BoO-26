@@ -87,12 +87,11 @@
     "flame_damage": 2,
     "flame_from_hp": 12,
     "size": [
-      96,
-      44
+      88,
+      46
     ],
     "olives": 15,
     "_note": "A bronze machine from Hephaestus's forge, or a copy of one. Its armoured front shrugs off the club: dodge its charge, strike its back, or hit it while it's dazed against a wall.",
-    "scale": 2,
-    "art_shift": 3
+    "art_shift": 5
   }
 }
